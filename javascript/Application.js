@@ -5,7 +5,6 @@
     this.screen = screen;
     this.graphics = resource;
     this.pause = false;
-    this.bindEvent();
     this.init();
   }
 
@@ -18,10 +17,6 @@
 
   proto.restart = function() {
 
-  }
-
-  proto.bindEvent = function() {
-    
   }
 
   Util.augment(Application, proto);

@@ -50,6 +50,20 @@
       };
       return r;
     },
+    pushUnique: function(arr, val) {
+      if (this.indexOf(arr, val) === -1) {
+        arr.push(val);
+        return true;
+      }
+      return false;
+    },
+    transpose: function(obj) {
+      var transpose = {};
+      this.each(obj, function(val, key) {
+        transpose[val] = key;
+      });
+      return transpose;
+    },
     each: function(object, fn) {
       if (!object) return;
       for (var i in object) {
@@ -58,6 +72,18 @@
         }
       }
       return object;
+    },
+    indexOf: function(arr, val) {
+      if (arr.indexOf) {
+        return arr.indexOf(val);
+      }
+      var i, len = arr.length;
+      for (i = 0; i < len; i++) {
+        if (arr[i] === val) {
+          return i;
+        }
+      }
+      return -1;
     },
     removeValue: function(arr, val) {
       var index = this.indexOf(arr, val);
@@ -76,9 +102,16 @@
     bind: function(e, handler) {
       if (global.addEventListener) {
         global.addEventListener(e, handler, false);
-      } else if (document.attachEvent) {
-        document.attachEvent('on' + e, handler);
+      } else if (global.document.attachEvent) {
+        global.document.attachEvent('on' + e, handler);
       }
+    },
+    requestAnimationFrame:
+    global.requestAnimationFrame       ||
+    global.webkitRequestAnimationFrame ||
+    global.mozRequestAnimationFrame    ||
+    function(callback){
+      global.setTimeout(callback, 1000 / 60);
     }
   };
 

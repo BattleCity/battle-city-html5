@@ -1,16 +1,18 @@
 'use strict';
 
 (function(exports, undefined) {
-  window.sss = 20;
+
   function Sprite(image, scale, x, y, width, height, posX, posY) {
     this.scale = scale || 1;
     this.x = x * this.scale;
     this.y = y * this.scale;
     this.image = image.image;
-    this.width = (width || image.width) * this.scale;
-    this.height = (height || image.height) * this.scale;
-    this.posX = posX;
-    this.posY = posY;
+    this.originWidth = width || image.width;
+    this.originHeight = height || image.height;
+    this.width = this.originWidth * this.scale;
+    this.height = this.originHeight * this.scale;
+    this.posX = posX || 0;
+    this.posY = posY || 0;
     Sprite.sup.call(this);
     return this;
   }
@@ -26,11 +28,11 @@
   }
 
   proto.draw = function(ctx) {
-    this.offsetX = (this.posX || 0) * this.scale * this.width;
-    this.offsetY = (this.posY || 0) * this.scale * this.height;
+    var offsetX = this.posX * this.originWidth;
+    var offsetY = this.posY * this.originHeight;
     ctx.save();
     ctx.translate(this.x, this.y);
-    ctx.drawImage(this.image, this.offsetX, this.offsetY, this.width, this.height, 0, 0, this.width, this.height);
+    ctx.drawImage(this.image, offsetX, offsetY, this.originWidth, this.originHeight, 0, 0, this.width, this.height);
     ctx.restore();
   }
 
