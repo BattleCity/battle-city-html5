@@ -19,6 +19,7 @@
   }
 
   proto.play = function() {
+    return;
     this.element.play();
   }
 

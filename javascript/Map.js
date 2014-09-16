@@ -51,6 +51,7 @@
     this.graphics = graphics;
     this.screen = screen;
     this.ctx = this.screen.ctx;
+    this.cellWidth = this.graphics['tile'].width / 14;
     this.init();
   }
 
@@ -60,18 +61,26 @@
     this.map = MAP[this.index - 1];
   }
 
+  proto.drawBackground = function() {
+    this.ctx.fillStyle = "#7f7f7f";
+    this.ctx.fillRect(0, 0, this.screen.width, this.screen.height);
+    this.ctx.fillStyle = "#000";
+    this.ctx.fillRect(this.screen.offsetX, this.screen.offsetY, this.cellWidth * 26 * this.screen.scale, this.cellWidth * 26 * this.screen.scale);
+  }
+
   proto.draw = function() {
     var that = this;
+    this.drawBackground();
     var scale = this.screen.scale;
     Util.each(this.map, function(i, y) {
       Util.each(i, function(j, x) {
         var image = that.graphics['tile'].image;
-        var originWidth = that.graphics['tile'].width / 14;
+        var originWidth = that.cellWidth;
         var originHeight = that.graphics['tile'].height / 2;
         var width = originWidth * scale;
         var height = originHeight * scale;
         that.ctx.save();
-        that.ctx.translate(width * x, height * y);
+        that.ctx.translate(width * x + that.screen.offsetX, height * y + that.screen.offsetY);
         var posX = -1;
         var posY = -1;
         switch (j) {

@@ -2,9 +2,9 @@
 
 (function(exports, undefined) {
 
-  function Player() {
+  function Player(image, scale, x, y, width, height, posX, posY) {
+    Player.sup.call(this, image, scale, x, y, width, height, posX, posY);
     this.init();
-    Player.sup.call(this);
   }
 
   var proto = {};

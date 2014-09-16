@@ -29,9 +29,9 @@
     this.screen.add(splash);
     var playerOffsetX = splashOffsetX + 70;
     var playerOffsetY = splashOffsetY + 170;
-    var playerWidth = this.graphics.player1.width / 8;
-    var playerHeight = this.graphics.player1.height / 4;
-    this.player = new Sprite(this.graphics.player1, this.screen.scale, playerOffsetX, playerOffsetY + moveHeight, playerWidth, playerHeight, 0, 1);
+    this.playerWidth = this.graphics.player1.width / 8;
+    this.playerHeight = this.graphics.player1.height / 4;
+    this.player = new Sprite(this.graphics.player1, this.screen.scale, playerOffsetX, playerOffsetY + moveHeight, this.playerWidth, this.playerHeight, 0, 1);
     this.player.update = function() {
       this.posX = this.posX ? 0 : 1;
       if (!that.welcoming) {
@@ -70,10 +70,16 @@
 
   proto.start = function() {
     this.screen.clean();
+    this.cellWidth = this.graphics['tile'].width / 14;
     this.startround = true;
     new Sound(SOUNDDIR + 'start' + SOUNDSUFFIX).play();
     var map = new Map(this.index, this.screen, this.graphics);
     this.screen.add(map);
+    var player1 = new Player(this.graphics.player1, this.screen.scale, this.screen.offsetX, this.screen.offsetY, this.playerWidth, this.playerHeight, 0, 0);
+    player1.update = function() {
+      this.posX = this.posX ? 0 : 1;
+    }
+    this.screen.add(player1);
   }
 
   proto.bindEvent = function() {

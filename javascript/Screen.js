@@ -7,6 +7,8 @@
     this.scale = scale;
     this.width = DEFAULTWIDTH * scale;
     this.height = DEFAULTHEIGHT * scale;
+    this.offsetX = this.width / 25;
+    this.offsetY = this.height / 12.5;
     this.displayObjectList = [];
     this.init();
   }

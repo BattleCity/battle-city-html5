@@ -4,7 +4,7 @@
 
   var config = {};
 
-  function Tank() {
+  function Tank(image, scale, x, y, width, height, posX, posY) {
     this.direction = 'up';
     this.speed = 1;
     this.superman = false;
@@ -14,8 +14,8 @@
       x: 0,
       y: 0
     };
+    Tank.sup.call(this, image, scale, x, y, width, height, posX, posY);
     this.init();
-    Tank.sup.call(this);
   }
 
   var proto = {};
