@@ -11,7 +11,9 @@
   exports.PLAYER1LIFE = 3;
   exports.PLAYER2LIFE = 3;
   exports.GRAPHICESDIR = './resource/graphics/';
-  exports.GRAPHICSUFFIX = '.bmp'
+  exports.SOUNDDIR = './resource/sound/';
+  exports.GRAPHICSUFFIX = '.bmp';
+  exports.SOUNDSUFFIX = '.mp3';
   exports.OFFSETX = 0;
   exports.OFFSETY = 0;
   exports.DEBUG = true;

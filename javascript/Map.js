@@ -3,12 +3,17 @@
 (function(exports, undefined) {
   // static
 
-	var NONE = 0,
-	WALL = 1,
-	STEEL = 2,
-	GRASS = 3,
-	WATER = 4,
-	ICE = 5;
+	var NONE = 0;
+	var WALL = 1;
+	var STEEL = 2;
+	var GRASS = 3;
+	var WATER = 4;
+	var ICE = 5;
+
+  var HOME1 = 6;
+  var HOME2 = 7;
+  var HOME3 = 8;
+  var HOME4 = 9;
 
   var map1 = [
     [0,0,0,0,0,0,2,2,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0],
@@ -35,8 +40,8 @@
     [0,0,1,1,0,0,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,0,0,1,1,0,0],
-    [0,0,1,1,0,0,1,1,0,0,0,1,9,8,1,0,0,0,1,1,1,1,1,1,0,0],
-    [0,0,1,1,0,0,1,1,0,0,0,1,8,8,1,0,0,0,1,1,1,1,1,1,0,0],
+    [0,0,1,1,0,0,1,1,0,0,0,1,6,7,1,0,0,0,1,1,1,1,1,1,0,0],
+    [0,0,1,1,0,0,1,1,0,0,0,1,8,9,1,0,0,0,1,1,1,1,1,1,0,0],
   ];
 
   var MAP = [map1];
@@ -57,15 +62,60 @@
 
   proto.draw = function() {
     var that = this;
+    var scale = this.screen.scale;
     Util.each(this.map, function(i, y) {
       Util.each(i, function(j, x) {
+        var image = that.graphics['tile'].image;
+        var originWidth = that.graphics['tile'].width / 14;
+        var originHeight = that.graphics['tile'].height / 2;
+        var width = originWidth * scale;
+        var height = originHeight * scale;
+        that.ctx.save();
+        that.ctx.translate(width * x, height * y);
+        var posX = -1;
+        var posY = -1;
         switch (j) {
           case NONE:
             break;
           case WALL:
-            //that.ctx.drawImage(that.graphics['tile'].image, 0, 0, 10, 10, 0, 0, 10, 10);
+            posX = 0;
+            posY = 0;
+            break;
+          case STEEL:
+            posX = 1;
+            posY = 0;
+            break;
+          case GRASS:
+            posX = 2;
+            posY = 0;
+            break;
+          case ICE:
+            posX = 3;
+            posY = 0;
+            break;
+          case WATER:
+            posX = 4;
+            posY = 0;
+            break;
+          case HOME1:
+            posX = 5;
+            posY = 0;
+            break;
+          case HOME2:
+            posX = 5.5;
+            posY = 0;
+            break;
+          case HOME3:
+            posX = 5;
+            posY = 0.5;
+            break;
+          case HOME4:
+            posX = 5.5;
+            posY = 0.5;
             break;
         }
+        that.ctx.drawImage(image, posX * 2 * originWidth, posY * 2 * originHeight, originWidth, originHeight, 0, 0, width, height);
+        that.ctx.restore();
       })
     })
   }

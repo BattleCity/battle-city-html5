@@ -13,6 +13,7 @@
   }
 
   var proto = {};
+
   proto.welcome = function() {
     var that = this;
     var scale = this.screen.scale;
@@ -70,7 +71,7 @@
   proto.start = function() {
     this.screen.clean();
     this.startround = true;
-    new Sound('./resource/sound/start.mp3').play();
+    new Sound(SOUNDDIR + 'start' + SOUNDSUFFIX).play();
     var map = new Map(this.index, this.screen, this.graphics);
     this.screen.add(map);
   }
@@ -88,6 +89,17 @@
     });
     Keyboard.DOWN.down(function(){
     });
+  }
+
+  proto.pause = function() {
+  }
+
+  proto.restart = function() {
+
+  }
+
+  proto.end = function() {
+
   }
 
   Util.augment(Stage, proto);

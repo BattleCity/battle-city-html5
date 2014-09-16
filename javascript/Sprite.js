@@ -19,7 +19,7 @@
 
   var proto = {};
 
-  proto.hitTestObject = function(obj) {
+  proto.hitTest = function(obj) {
     var minx = this.x > obj.x ? this.x :obj.x;
     var maxx = this.x + this.width < obj.x + obj.width ? this.x + this.width : obj.x + obj.width;
     var miny = this.y > obj.y ? this.y : obj.y;
@@ -34,6 +34,10 @@
     ctx.translate(this.x, this.y);
     ctx.drawImage(this.image, offsetX, offsetY, this.originWidth, this.originHeight, 0, 0, this.width, this.height);
     ctx.restore();
+  }
+
+  proto.destroy = function() {
+
   }
 
   proto.update = function() {}

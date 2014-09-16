@@ -15,10 +15,6 @@
     this.stage.welcome();
   }
 
-  proto.restart = function() {
-
-  }
-
   Util.augment(Application, proto);
   exports.Application = Application;
 })(this);
