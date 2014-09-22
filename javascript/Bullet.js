@@ -18,7 +18,3 @@
   Util.inherit(Bullet, Sprite);
   exports.Bullet = Bullet;
 })(this);
-
-
-
-

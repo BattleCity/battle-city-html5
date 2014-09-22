@@ -46,7 +46,6 @@
 
   proto.on = function(arg1,arg2) {
     if (Util.type(arg1) === 'object') {
-
       for (var j in arg1) {
         _bind.call(this,j,arg1[j]);
       }

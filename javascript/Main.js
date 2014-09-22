@@ -2,14 +2,23 @@
 
 (function(exports, undefined) {
 
-  var screen = new Screen('screen', SCREENWIDTH / DEFAULTWIDTH);
-  var timer = new Timer();
-  var loader = new SourceLoader();
-  loader.load(Resource);
-  loader.on('success', function(item) {
-  }).on('complete', function(resource) {
-    new Application(screen, resource);
-    timer.listen(screen).start();
+  var screen = new Screen({
+    element: 'screen',
+    scale: SCREENWIDTH / DEFAULTWIDTH
   });
 
+  var timer = new Timer();
+
+  new SourceLoader()
+  .load(Resource)
+  .on('success', function(item) {
+  })
+  .on('complete', function(graphics) {
+    new Application({
+      index: STARTSTAGE,
+      screen: screen,
+      graphics: graphics
+    });
+    timer.listen(screen).start();
+  });
 })(this);

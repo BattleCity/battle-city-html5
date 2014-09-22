@@ -47,6 +47,7 @@
   var MAP = [map1];
 
   function Map(index, screen, graphics) {
+    return
     this.index = index || 1;
     this.graphics = graphics;
     this.screen = screen;

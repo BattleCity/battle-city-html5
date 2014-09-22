@@ -16,6 +16,3 @@
   Util.inherit(Enemy, Tank);
   exports.Enemy = Enemy;
 })(this);
-
-
-

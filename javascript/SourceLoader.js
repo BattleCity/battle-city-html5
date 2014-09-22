@@ -5,6 +5,7 @@
   function SourceLoader() {
     SourceLoader.sup.call(this);
     this.hash = {};
+    return this;
   }
 
   function _imageLoader(item) {
@@ -42,6 +43,7 @@
     Util.each(this.query, function(i) {
       _imageLoader.call(that, i);
     });
+    return this;
   }
 
   proto.size = function() {

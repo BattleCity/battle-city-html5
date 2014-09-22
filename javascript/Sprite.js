@@ -2,24 +2,60 @@
 
 (function(exports, undefined) {
 
-  function Sprite(image, scale, x, y, width, height, posX, posY) {
-    this.scale = scale || 1;
-    this.x = x * this.scale;
-    this.y = y * this.scale;
-    this.image = image.image;
-    this.originWidth = width || image.width;
-    this.originHeight = height || image.height;
-    this.width = this.originWidth * this.scale;
-    this.height = this.originHeight * this.scale;
-    this.posX = posX || 0;
-    this.posY = posY || 0;
+  /**
+   * @constructor     Sprite
+   * @param {Object}  options
+   * @return {Object} instance
+   */
+  function Sprite(options) {
     Sprite.sup.call(this);
+    /* @name  options
+     * @param {Object}  context
+     * @param {Image}   image
+     * @param {Number}  scaleX
+     * @param {Number}  scaleY
+     * @param {Number}  alpha
+     * @param {Number}  offseX
+     * @param {Number}  offsetY
+     * @param {Number}  width
+     * @param {Number}  height
+     * @param {Number}  x
+     * @param {Number}  y
+     * @param {Number}  rotation
+     * @param {Boolean} visible
+     * @param {Boolean} debug
+     */
+    var opt = {
+      image: null,
+      scale: 1,
+      alpha: 1,
+      offsetX: 0,
+      offsetY: 0,
+      width: 300,
+      height: 150,
+      x: 0,
+      y: 0,
+      rotation: 0,
+      visible: true,
+      debug: false
+    };
+    Util.merge(opt, options);
+    Util.merge(this, opt);
     return this;
   }
 
-  var proto = {};
+  function _draw(ctx) {
+    if (!this.visible) return;
+    this.update();
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.rotate(this.rotation * Math.PI/180);
+    ctx.translate(this.offsetX * this.scale, this.offsetY * this.scale);
+    ctx.drawImage(this.image, this.x * this.width, this.y * this.height, this.width, this.height, 0, 0, this.width * this.scale, this.height * this.scale);
+    ctx.restore();
+  }
 
-  proto.hitTest = function(obj) {
+  function _hitTest(obj) {
     var minx = this.x > obj.x ? this.x :obj.x;
     var maxx = this.x + this.width < obj.x + obj.width ? this.x + this.width : obj.x + obj.width;
     var miny = this.y > obj.y ? this.y : obj.y;
@@ -27,17 +63,14 @@
     return minx <= maxx && miny <= maxy;
   }
 
+  var proto = {};
+
   proto.draw = function(ctx) {
-    var offsetX = this.posX * this.originWidth;
-    var offsetY = this.posY * this.originHeight;
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.drawImage(this.image, offsetX, offsetY, this.originWidth, this.originHeight, 0, 0, this.width, this.height);
-    ctx.restore();
+    _draw.call(this, ctx);
   }
 
-  proto.destroy = function() {
-
+  proto.hitTest = function(obj) {
+    _hitTest.call(this, obj);
   }
 
   proto.update = function() {}
@@ -46,3 +79,4 @@
   Util.inherit(Sprite, Base);
   exports.Sprite = Sprite;
 })(this);
+

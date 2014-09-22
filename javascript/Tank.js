@@ -4,17 +4,21 @@
 
   var config = {};
 
-  function Tank(image, scale, x, y, width, height, posX, posY) {
-    this.direction = 'up';
-    this.speed = 1;
-    this.superman = false;
-    this.dead = false;
-    this.life = 1;
-    this.position = {
-      x: 0,
-      y: 0
+  function Tank(options) {
+    var opt = {
+      direction: 'up',
+      speed: 1,
+      superman: false,
+      dead: false,
+      life: 1,
+      position: {
+        x: 0,
+        y: 0
+      }
     };
-    Tank.sup.call(this, image, scale, x, y, width, height, posX, posY);
+    Util.merge(opt, options);
+    Util.merge(this, opt);
+    Tank.sup.call(this, options);
     this.init();
   }
 

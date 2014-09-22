@@ -92,7 +92,7 @@
       }
     },
     type: function(c) {
-      if (c === null || typeof c === "undefined") {
+      if (c === null || typeof c === 'undefined') {
         return String(c);
       } else {
         return Object.prototype.toString.call(c).replace(/\[object |\]/g, '').toLowerCase();

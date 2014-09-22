@@ -2,8 +2,11 @@
 
 (function(exports, undefined) {
 
-  function Player(image, scale, x, y, width, height, posX, posY) {
-    Player.sup.call(this, image, scale, x, y, width, height, posX, posY);
+  function Player(options) {
+    var opt = {};
+    Util.merge(opt, options);
+    Util.merge(this, opt);
+    Player.sup.call(this, opt);
     this.init();
   }
 

@@ -2,11 +2,11 @@
 
 (function(exports, undefined) {
 
-  function Screen(container, scale) {
-    this.container = Util.$(container);
-    this.scale = scale;
-    this.width = DEFAULTWIDTH * scale;
-    this.height = DEFAULTHEIGHT * scale;
+  function Screen(options) {
+    this.element = Util.$(options.element);
+    this.scale = options.scale;
+    this.width = DEFAULTWIDTH * this.scale;
+    this.height = DEFAULTHEIGHT * this.scale;
     this.offsetX = this.width / 25;
     this.offsetY = this.height / 12.5;
     this.displayObjectList = [];
@@ -16,10 +16,10 @@
   var proto = {};
 
   proto.init = function() {
-    if (!this.container) return;
-    this.ctx = this.container.getContext('2d');
-    this.container.width = this.width;
-    this.container.height = this.height;
+    if (!this.element) return;
+    this.ctx = this.element.getContext('2d');
+    this.element.width = this.width;
+    this.element.height = this.height;
   }
 
   proto.clear = function() {
@@ -31,7 +31,6 @@
     this.clear();
     Util.each(this.displayObjectList, function(i) {
       i.draw(that.ctx);
-      i.update();
     });
   }
 
