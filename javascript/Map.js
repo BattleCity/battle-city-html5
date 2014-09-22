@@ -46,13 +46,8 @@
 
   var MAP = [map1];
 
-  function Map(index, screen, graphics) {
-    return
+  function Map(index) {
     this.index = index || 1;
-    this.graphics = graphics;
-    this.screen = screen;
-    this.ctx = this.screen.ctx;
-    this.cellWidth = this.graphics['tile'].width / 14;
     this.init();
   }
 

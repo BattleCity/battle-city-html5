@@ -6,7 +6,10 @@
       screen: null,
       graphics: null,
       index: 0,
-      debug: false
+      debug: false,
+      player1: 3,
+      player2: 3,
+      enemy: 20
     };
     Util.merge(opt, options);
     Util.merge(this, opt);
@@ -94,14 +97,8 @@
     });
   }
 
-  proto.start = function(playerNum) {
-    this.screen.clean();
+  proto.initPlayer = function(playerNum, map) {
     var scale = this.screen.scale;
-    new Sound(SOUNDDIR + 'start' + SOUNDSUFFIX).play();
-
-    var map = new Map({
-      index: 0
-    });
 
     var player1 = new Player({
       image: this.graphics.player1.image,
@@ -120,6 +117,17 @@
     }
     this.screen.add(player1);
 
+    Util.bind('keydown', function(e) {
+
+      if (e.keyCode === Keyboard.DOWN.keyCode) {
+        playerNum = 2;
+      } else if (e.keyCode === Keyboard.UP.keyCode) {
+        playerNum = 1;
+      } else if (e.keyCode === Keyboard.ENTER.keyCode) {
+        that.start(playerNum);
+      }
+    });
+
     if (playerNum === 2) {
       var player2 = new Player({
         image: this.graphics.player2.image,
@@ -137,10 +145,44 @@
         this.x = this.x ? 0 : 1;
       }
       this.screen.add(player2);
-    }
+      Util.bind('keydown', function(e) {
 
+        if (e.keyCode === Keyboard.DOWN.keyCode) {
+          playerNum = 2;
+        } else if (e.keyCode === Keyboard.UP.keyCode) {
+          playerNum = 1;
+        } else if (e.keyCode === Keyboard.ENTER.keyCode) {
+          that.start(playerNum);
+        }
+      });
+    }
+  }
+
+  proto.initEnemy = function(map) {
+  
+  }
+
+  proto.initBoard = function(playerNum, map) {
+  
+  }
+
+  proto.mapRenderLayer1 = function(map) {
     var cellWidth = this.graphics['tile'].width / 14;
-    this.screen.add(map);
+  }
+
+  proto.mapRenderLayer2 = function(map) {}
+
+  proto.start = function(playerNum) {
+    this.screen.clean();
+    new Sound(SOUNDDIR + 'start' + SOUNDSUFFIX).play();
+    var map = new Map({
+      index: 0
+    }).map;
+    this.mapRenderLayer1(map);
+    this.initPlayer(playerNum, map);
+    this.initEnemy(map);
+    this.initBoard(playerNum, map);
+    this.mapRenderLayer2(map);
   }
 
   proto.bindEvent = function() {
