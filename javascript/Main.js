@@ -8,16 +8,17 @@
   });
 
   var timer = new Timer();
-
   new SourceLoader()
-  .load(Resource)
+  .load(Resource.GRAPHICS)
+  .load(Resource.SOUNDS)
   .on('success', function(item) {
+    //console.log(item)
   })
-  .on('complete', function(graphics) {
+  .on('complete', function(Resource) {
     new Application({
       index: STARTSTAGE,
       screen: screen,
-      graphics: graphics
+      resource: Resource
     });
     timer.listen(screen).start();
   });

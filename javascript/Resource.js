@@ -2,29 +2,97 @@
 
 (function(exports, undefined) {
 
-  var graphics = 'bonus bore bullet enemy explode1 explode2 flag gameover misc num player1 player2 shield splash tile'.split(' ');
+  var GRAPHICS = 'bonus bore bullet enemy explode1 explode2 flag gameover misc num player1 player2 shield splash tile'.split(' ');
+  var SOUNDS = 'add blast eat end enemy fire lose move start'.split(' ');
+
+  var map1 = [
+    [0,0,0,0,0,0,2,2,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,2,2,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0],
+    [0,0,1,1,0,0,2,2,0,0,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0],
+    [0,0,1,1,0,0,2,2,0,0,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0],
+    [0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0,1,1,2,2,1,1,0,0],
+    [0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0,1,1,2,2,1,1,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0],
+    [3,3,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,1,1,3,3,1,1,2,2],
+    [3,3,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,1,1,3,3,1,1,2,2],
+    [3,3,3,3,0,0,0,0,0,0,1,1,0,0,0,0,2,2,0,0,3,3,0,0,0,0],
+    [3,3,3,3,0,0,0,0,0,0,1,1,0,0,0,0,2,2,0,0,3,3,0,0,0,0],
+    [0,0,1,1,1,1,1,1,3,3,3,3,3,3,2,2,0,0,0,0,3,3,1,1,0,0],
+    [0,0,1,1,1,1,1,1,3,3,3,3,3,3,2,2,0,0,0,0,3,3,1,1,0,0],
+    [0,0,0,0,0,0,2,2,3,3,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0],
+    [0,0,0,0,0,0,2,2,3,3,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0],
+    [2,2,1,1,0,0,2,2,0,0,1,1,0,0,1,1,0,0,0,0,0,0,1,1,0,0],
+    [2,2,1,1,0,0,2,2,0,0,1,1,0,0,1,1,0,0,0,0,0,0,1,1,0,0],
+    [0,0,1,1,0,0,1,1,0,0,1,1,1,1,1,1,0,0,1,1,2,2,1,1,0,0],
+    [0,0,1,1,0,0,1,1,0,0,1,1,1,1,1,1,0,0,1,1,2,2,1,1,0,0],
+    [0,0,1,1,0,0,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+    [0,0,1,1,0,0,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,0,0,1,1,0,0],
+    [0,0,1,1,0,0,1,1,0,0,0,1,6,7,1,0,0,0,1,1,1,1,1,1,0,0],
+    [0,0,1,1,0,0,1,1,0,0,0,1,8,9,1,0,0,0,1,1,1,1,1,1,0,0],
+  ];
+
+  var MAPS = [map1];
   function Resource(graphics) {
-    this.resource = [];
+    this.graphics = [];
+    this.sounds = [];
+    this.maps = [null];
   }
 
   var proto = Resource.prototype;
 
-  proto.add = function(id) {
-    this.resource.push({
+  proto.addGraphic = function(id) {
+    this.graphics.push({
+      type: 'graphic',
       id: id,
       src: GRAPHICESDIR + id + GRAPHICSUFFIX
     });
-    return this;
   }
 
-  proto.query = function(arr) {
+  proto.loadGraphics = function(arr) {
     var that = this;
     Util.each(arr, function(i) {
-      that.add(i);
+      that.addGraphic(i);
     })
-    return this;
+    return this.graphics;
   }
 
-  exports.Resource = new Resource().query(graphics).resource;
-})(this);
+  proto.addSound = function(id) {
+    this.sounds.push({
+      type: 'sound',
+      id: id,
+      src: SOUNDDIR + id + SOUNDSUFFIX
+    });
+  }
 
+  proto.loadSounds = function(arr) {
+    var that = this;
+    Util.each(arr, function(i) {
+      that.addSound(i);
+    });
+    return this.sounds;
+  }
+
+  proto.addMap = function(i) {
+    this.maps.push(i);
+  }
+
+  proto.loadMaps = function(arr) {
+    var that = this;
+    Util.each(arr, function(i) {
+      that.addMap(i);
+    });
+    return this.maps;
+  }
+
+  var instance = new Resource();
+  var R = {};
+
+  R.GRAPHICS = instance.loadGraphics(GRAPHICS);
+  R.SOUNDS = instance.loadSounds(SOUNDS);
+  R.MAPS = instance.loadMaps(MAPS);
+
+  exports.Resource = R;
+})(this);

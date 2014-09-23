@@ -2,8 +2,6 @@
 
 (function(exports, undefined) {
 
-  var config = {};
-
   function Tank(options) {
     var opt = {
       direction: 'up',
@@ -14,11 +12,13 @@
       position: {
         x: 0,
         y: 0
-      }
+      },
+      cellWidth: 0
     };
     Util.merge(opt, options);
-    Util.merge(this, opt);
-    Tank.sup.call(this, options);
+    opt.offsetX += opt.position.x * opt.cellWidth;
+    opt.offsetY += opt.position.y * opt.cellWidth;
+    Tank.sup.call(this, opt);
     this.init();
   }
 

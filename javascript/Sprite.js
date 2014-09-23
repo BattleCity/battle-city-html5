@@ -41,7 +41,6 @@
     };
     Util.merge(opt, options);
     Util.merge(this, opt);
-    return this;
   }
 
   function _draw(ctx) {

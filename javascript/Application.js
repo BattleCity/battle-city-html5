@@ -4,7 +4,7 @@
   function Application(options) {
     var opt = {
       screen: null,
-      graphics: null,
+      resource: null,
       index: 0,
       debug: false,
       player1: 3,
@@ -13,6 +13,8 @@
     };
     Util.merge(opt, options);
     Util.merge(this, opt);
+    this.graphics = this.resource.graphics;
+    this.sounds = this.resource.sounds;
     this.welcome();
   }
 
@@ -105,11 +107,17 @@
       scale: scale,
       width: this.playerWidth,
       height: this.playerHeight,
-      offsetX: 10,
-      offsetY: 10,
+      offsetX: this.screen.offsetX / scale + 2,
+      offsetY: this.screen.offsetY / scale + 2,
       x: 0,
       y: 0,
-      map: map
+      map: map,
+      position: {
+        x: 8,
+        y: 24
+      },
+      speed: 5,
+      cellWidth: this.graphics['tile'].height / 2
     });
 
     player1.update = function() {
@@ -120,11 +128,13 @@
     Util.bind('keydown', function(e) {
 
       if (e.keyCode === Keyboard.DOWN.keyCode) {
-        playerNum = 2;
+        player1.offsetY += player1.speed;
       } else if (e.keyCode === Keyboard.UP.keyCode) {
-        playerNum = 1;
-      } else if (e.keyCode === Keyboard.ENTER.keyCode) {
-        that.start(playerNum);
+        player1.offsetY -= player1.speed;
+      } else if (e.keyCode === Keyboard.LEFT.keyCode) {
+        player1.offsetX -= player1.speed;
+      } else if (e.keyCode === Keyboard.RIGHT.keyCode) {
+        player1.offsetX += player1.speed;
       }
     });
 
@@ -134,11 +144,16 @@
         scale: scale,
         width: this.playerWidth,
         height: this.playerHeight,
-        offsetX: 50,
-        offsetY: 10,
+        offsetX: this.screen.offsetX / scale + 2,
+        offsetY: this.screen.offsetY / scale + 2,
         x: 0,
         y: 0,
-        map: map
+        map: map,
+        position: {
+          x: 16,
+          y: 24
+        },
+        cellWidth: this.graphics['tile'].height / 2
       });
 
       player2.update = function() {
@@ -166,38 +181,43 @@
   
   }
 
-  proto.mapRenderLayer1 = function(map) {
-    var cellWidth = this.graphics['tile'].width / 14;
+  proto.mapRenderLayer0 = function(map) {
+    this.screen.add(new Map({
+      layer: 0,
+      map: map,
+      width: this.screen.width,
+      height: this.screen.height,
+      cellWidth: this.graphics['tile'].height / 2,
+      offsetX: this.screen.offsetX,
+      offsetY: this.screen.offsetY,
+      image: this.graphics['tile'].image,
+      scale: this.screen.scale
+    }));
   }
 
-  proto.mapRenderLayer2 = function(map) {}
+  proto.mapRenderLayer1 = function(map) {
+    this.screen.add(new Map({
+      layer: 1,
+      map: map,
+      width: this.screen.width,
+      height: this.screen.height,
+      cellWidth: this.graphics['tile'].height / 2,
+      offsetX: this.screen.offsetX,
+      offsetY: this.screen.offsetY,
+      image: this.graphics['tile'].image,
+      scale: this.screen.scale
+    }));
+  }
 
   proto.start = function(playerNum) {
     this.screen.clean();
-    new Sound(SOUNDDIR + 'start' + SOUNDSUFFIX).play();
-    var map = new Map({
-      index: 0
-    }).map;
-    this.mapRenderLayer1(map);
+    this.sounds['start'].sound.play();
+    var map = Resource.MAPS[1];
+    this.mapRenderLayer0(map);
     this.initPlayer(playerNum, map);
     this.initEnemy(map);
-    this.initBoard(playerNum, map);
-    this.mapRenderLayer2(map);
-  }
-
-  proto.bindEvent = function() {
-    var that = this;
-    Keyboard.run(function () {
-      Keyboard.simulate();
-    });
-    Keyboard.RIGHT.down(function () {
-    });
-    Keyboard.UP.down(function () {
-    });
-    Keyboard.LEFT.down(function(){
-    });
-    Keyboard.DOWN.down(function(){
-    });
+    this.mapRenderLayer1(map);
+    this.initBoard();
   }
 
   proto.pause = function() {
