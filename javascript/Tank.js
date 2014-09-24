@@ -27,6 +27,47 @@
   proto.init = function() {
   }
 
+  proto.run = function() {
+    switch (this.direction) {
+      case 'up':
+        this.y = 0;
+        this.x = this.x ? 0 : 1;
+        break;
+      case 'down':
+        this.y = 2;
+        this.x = this.x ? 0 : 1;
+        break;
+      case 'left':
+        this.y = 3;
+        this.x = this.x ? 0 : 1;
+        break;
+      case 'right':
+        this.y = 1;
+        this.x = this.x ? 0 : 1;
+        break;
+    }
+  }
+
+  proto.forward = function(direct) {
+    if (this.directtion !== direct) {
+      this.direction = direct;
+    }
+    switch (this.direction) {
+      case 'up':
+        this.offsetY -= this.speed;
+        break;
+      case 'down':
+        this.offsetY += this.speed;
+        break;
+      case 'left':
+        this.offsetX -= this.speed;
+        break;
+      case 'right':
+        this.offsetX += this.speed;
+        break;
+    }
+  }
+
   Util.augment(Tank, proto);
   Util.inherit(Tank, Sprite);
   exports.Tank = Tank;

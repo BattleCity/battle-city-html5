@@ -116,25 +116,25 @@
         x: 8,
         y: 24
       },
-      speed: 5,
+      speed: 1,
       cellWidth: this.graphics['tile'].height / 2
     });
 
     player1.update = function() {
-      this.x = this.x ? 0 : 1;
+      player1.run();
     }
     this.screen.add(player1);
 
     Util.bind('keydown', function(e) {
 
       if (e.keyCode === Keyboard.DOWN.keyCode) {
-        player1.offsetY += player1.speed;
+        player1.forward('down');
       } else if (e.keyCode === Keyboard.UP.keyCode) {
-        player1.offsetY -= player1.speed;
+        player1.forward('up');
       } else if (e.keyCode === Keyboard.LEFT.keyCode) {
-        player1.offsetX -= player1.speed;
+        player1.forward('left');
       } else if (e.keyCode === Keyboard.RIGHT.keyCode) {
-        player1.offsetX += player1.speed;
+        player1.forward('right');
       }
     });
 
