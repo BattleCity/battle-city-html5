@@ -2,7 +2,9 @@
 
 (function(exports, undefined) {
   var global = exports;
+
   global.requestAnimationFrame = Util.requestAnimationFrame;
+
   function Timer(fps) {
     this.paused = false;
     this.fps = fps;

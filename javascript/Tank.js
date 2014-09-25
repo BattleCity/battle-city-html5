@@ -49,6 +49,7 @@
   }
 
   proto.forward = function(direct) {
+    this.sounds['move'].sound.play();
     if (this.directtion !== direct) {
       this.direction = direct;
     }
@@ -66,6 +67,22 @@
         this.offsetX += this.speed;
         break;
     }
+  }
+
+  proto.shot = function() {
+    this.sounds['fire'].sound.play();
+    this.screen.add(new Bullet({
+      image: this.graphics.bullet.image,
+      width: this.graphics.bullet.width / 4,
+      height: this.graphics.bullet.height,
+      x: 0,
+      y: 0,
+      offsetX: this.offsetX,
+      offsetY: this.offsetY,
+      scale: this.scale,
+      direction: this.direction,
+      speed: 2
+    }));
   }
 
   Util.augment(Tank, proto);

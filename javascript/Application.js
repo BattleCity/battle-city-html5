@@ -117,7 +117,10 @@
         y: 24
       },
       speed: 1,
-      cellWidth: this.graphics['tile'].height / 2
+      cellWidth: this.graphics['tile'].height / 2,
+      screen: this.screen,
+      graphics: this.graphics,
+      sounds: this.sounds
     });
 
     player1.update = function() {
@@ -135,6 +138,8 @@
         player1.forward('left');
       } else if (e.keyCode === Keyboard.RIGHT.keyCode) {
         player1.forward('right');
+      } else if (e.keyCode === Keyboard.SPACE.keyCode) {
+        player1.shot();
       }
     });
 
@@ -153,11 +158,14 @@
           x: 16,
           y: 24
         },
-        cellWidth: this.graphics['tile'].height / 2
+        cellWidth: this.graphics['tile'].height / 2,
+        screen: this.screen,
+        graphics: this.graphics,
+        sounds: this.sounds
       });
 
       player2.update = function() {
-        this.x = this.x ? 0 : 1;
+        player2.run();
       }
       this.screen.add(player2);
       Util.bind('keydown', function(e) {
@@ -178,7 +186,15 @@
   }
 
   proto.initBoard = function(playerNum, map) {
-  
+    this.screen.add(new Board({
+      scale: this.screen.scale,
+      graphics: this.graphics,
+      screen: this.screen,
+      playerNum: playerNum,
+      enemyNum: 19,
+      offsetX: this.screen.offsetX + this.graphics['tile'].height * 13 * this.screen.scale + 15 * this.screen.scale,
+      offsetY: this.screen.offsetY + 15 * this.screen.scale
+    }));
   }
 
   proto.mapRenderLayer0 = function(map) {

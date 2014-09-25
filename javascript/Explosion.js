@@ -1,7 +1,10 @@
 'use strict';
 
 (function(exports, undefined) {
-  function Explostion() {
+  function Explostion(options) {
+    var opt = {};
+    Util.merge(opt, options);
+    Util.merge(this, opt);
     Sound.sup.call(this);
   }
 

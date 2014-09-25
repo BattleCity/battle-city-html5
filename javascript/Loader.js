@@ -44,6 +44,11 @@
   function _soundLoader(item) {
     var that = this;
     var sound = document.createElement('audio');
+    var _play = sound.play;
+    sound.play = function() {
+      this.load();
+      _play.call(this);
+    }
     sound.preload = 'auto';
     sound.oncanplay = function() {
       that.num ++;
