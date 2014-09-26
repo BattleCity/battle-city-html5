@@ -46,8 +46,10 @@
     var sound = document.createElement('audio');
     var _play = sound.play;
     sound.play = function() {
+      if (this._playing) return;
       this.load();
       _play.call(this);
+      this._playing = true;
     }
     sound.preload = 'auto';
     sound.oncanplay = function() {
@@ -69,6 +71,9 @@
           type: item.type
         });
       }
+    }
+    sound.onended = function() {
+      this._playing = false;
     }
     sound.src = item.src;
     document.body.appendChild(sound);

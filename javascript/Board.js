@@ -54,6 +54,17 @@
     ctx.translate(that.offsetX, that.offsetY + 200);
     ctx.drawImage(image, cellWidth, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
     ctx.restore();
+
+    if (this.playerNum === 2) {
+      ctx.save();
+      ctx.translate(that.offsetX + cellWidth * this.scale, that.offsetY + 180);
+      ctx.drawImage(image, cellWidth * 3, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
+      ctx.restore();
+      ctx.save();
+      ctx.translate(that.offsetX, that.offsetY + 260);
+      ctx.drawImage(image, cellWidth, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
+      ctx.restore();
+    }
     //this.showNumber(ctx, 1);
   }
 
@@ -62,7 +73,7 @@
     var cellWidth = 32;
     var image = this.graphics.flag.image;
     ctx.save();
-    ctx.translate(that.offsetX, that.offsetY + 220);
+    ctx.translate(that.offsetX, that.offsetY + 300);
     ctx.drawImage(image, 0, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
     ctx.restore();
     //this.showNumber(ctx, 2);

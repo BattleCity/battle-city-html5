@@ -185,7 +185,7 @@
   
   }
 
-  proto.initBoard = function(playerNum, map) {
+  proto.initBoard = function(playerNum) {
     this.screen.add(new Board({
       scale: this.screen.scale,
       graphics: this.graphics,
@@ -233,7 +233,38 @@
     this.initPlayer(playerNum, map);
     this.initEnemy(map);
     this.mapRenderLayer1(map);
-    this.initBoard();
+    this.welcomeAnim(playerNum);
+  }
+
+  proto.welcomeAnim = function(playerNum) {
+    var that = this;
+    var width = that.screen.width * that.screen.scale;
+    var height = that.screen.height * that.screen.scale / 2;
+    var diff = 0;
+    var counter = 0;
+    var anim = new Animation({
+    });
+    anim.draw = function(ctx) {
+      if (height - diff === 0) return;
+      if (height - diff === 50) {
+        that.initBoard(playerNum);
+      };
+      ctx.save();
+      ctx.fillStyle='#7f7f7f';
+      ctx.fillRect(0, 0, width, height - diff);
+      ctx.fillRect(0, height + diff, width, height - diff);
+      ctx.restore();
+      if (counter < 30) {
+        ctx.save();
+        ctx.translate(that.screen.width / 2, that.screen.height / 2);
+        ctx.drawImage(that.graphics.num.image, 0, 0, that.graphics.num.width / 10, that.graphics.num.height, 0, 0, that.graphics.num.width / 10 * that.screen.scale, that.graphics.num.height * that.screen.scale);
+        ctx.restore();
+      } else {
+        diff += 5;
+      }
+      counter ++;
+    }
+    this.screen.add(anim);
   }
 
   proto.pause = function() {
