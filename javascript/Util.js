@@ -68,7 +68,7 @@
       if (!object) return;
       for (var i in object) {
         if (object.hasOwnProperty(i)) {
-          fn.call(this,object[i],i);
+          fn.call(this, object[i],i);
         }
       }
       return object;
@@ -110,7 +110,7 @@
     global.requestAnimationFrame       ||
     global.webkitRequestAnimationFrame ||
     global.mozRequestAnimationFrame    ||
-    function(callback){
+    function(callback) {
       global.setTimeout(callback, 1000 / 60);
     }
   };

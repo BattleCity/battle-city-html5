@@ -31,7 +31,7 @@
       var row = parseInt((enemyNum - 1) / 2);
       var odd = enemyNum % 2 === 0;
       ctx.save();
-      ctx.translate(that.offsetX + odd * 10, that.offsetY + row * 10);
+      ctx.translate(that.offsetX + odd * 18 * this.scale, that.offsetY + row * 16 * this.scale);
       ctx.drawImage(image, 0, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
       ctx.restore();
       enemyNum --;

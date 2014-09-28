@@ -6,7 +6,6 @@
     var opt = {
       direction: 'up',
       speed: 1,
-      superman: false,
       dead: false,
       life: 1,
       position: {
@@ -18,6 +17,7 @@
     Util.merge(opt, options);
     opt.offsetX += opt.position.x * opt.cellWidth;
     opt.offsetY += opt.position.y * opt.cellWidth;
+    opt.speed *= opt.scale;
     Tank.sup.call(this, opt);
     this.init();
   }
@@ -25,6 +25,7 @@
   var proto = {};
 
   proto.init = function() {
+    this.shield();
   }
 
   proto.run = function() {
@@ -83,6 +84,13 @@
       direction: this.direction,
       speed: 2
     }));
+  }
+
+  proto.shield = function() {
+    var image = this.graphics.shield.image;
+    var width = this.graphics.shield.width;
+    var height = this.graphics.shield.height;
+    
   }
 
   Util.augment(Tank, proto);

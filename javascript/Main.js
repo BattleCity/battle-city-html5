@@ -8,18 +8,25 @@
   });
 
   var timer = new Timer();
-  new SourceLoader()
+
+  new Graphics()
   .load(Resource.GRAPHICS)
-  .load(Resource.SOUNDS)
-  .on('success', function(item) {
-    //console.log(item)
+  .on('success', function(graphic) {
   })
-  .on('complete', function(Resource) {
-    new Application({
-      index: STARTSTAGE,
-      screen: screen,
-      resource: Resource
+  .on('complete', function(graphics) {
+    new Sound()
+    .load(Resource.SOUNDS)
+    .on('success', function(sound) {
+    })
+    .on('complete', function(sounds){
+      new Application({
+        index: STARTSTAGE,
+        screen: screen,
+        graphics: graphics,
+        sounds: sounds
+      });
+      timer.listen(screen).start();
     });
-    timer.listen(screen).start();
   });
+
 })(this);

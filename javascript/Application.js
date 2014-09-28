@@ -13,12 +13,19 @@
     };
     Util.merge(opt, options);
     Util.merge(this, opt);
-    this.graphics = this.resource.graphics;
-    this.sounds = this.resource.sounds;
+    this.graphics = this.graphics;
+    this.sounds = this.sounds;
     this.welcome();
+    this.init();
   }
 
   var proto = {};
+
+  proto.init = function() {
+    Keyboard.run(function () {
+      Keyboard.simulate();
+    });
+  }
 
   proto.welcome = function() {
     var that = this;
@@ -80,6 +87,8 @@
 
     this.screen.add(this.player);
 
+    
+
     Util.bind('keydown', function(e) {
       if (startround) return;
       if (welcoming) {
@@ -128,20 +137,21 @@
     }
     this.screen.add(player1);
 
-    Util.bind('keydown', function(e) {
-
-      if (e.keyCode === Keyboard.DOWN.keyCode) {
-        player1.forward('down');
-      } else if (e.keyCode === Keyboard.UP.keyCode) {
-        player1.forward('up');
-      } else if (e.keyCode === Keyboard.LEFT.keyCode) {
-        player1.forward('left');
-      } else if (e.keyCode === Keyboard.RIGHT.keyCode) {
-        player1.forward('right');
-      } else if (e.keyCode === Keyboard.SPACE.keyCode) {
-        player1.shot();
-      }
+    Keyboard.S.down(function() {
+      player1.forward('down');
     });
+     Keyboard.W.down(function() {
+      player1.forward('up');
+     });
+     Keyboard.A.down(function() {
+      player1.forward('left');
+     });
+     Keyboard.D.down(function() {
+      player1.forward('right');
+     });
+     Keyboard.SPACE.press(function() {
+      player1.shot();
+     });
 
     if (playerNum === 2) {
       var player2 = new Player({
@@ -168,15 +178,21 @@
         player2.run();
       }
       this.screen.add(player2);
-      Util.bind('keydown', function(e) {
 
-        if (e.keyCode === Keyboard.DOWN.keyCode) {
-          playerNum = 2;
-        } else if (e.keyCode === Keyboard.UP.keyCode) {
-          playerNum = 1;
-        } else if (e.keyCode === Keyboard.ENTER.keyCode) {
-          that.start(playerNum);
-        }
+      Keyboard.DOWN.down(function() {
+        player2.forward('down');
+      });
+      Keyboard.UP.down(function() {
+        player2.forward('up');
+      });
+      Keyboard.LEFT.down(function() {
+        player2.forward('left');
+      });
+      Keyboard.RIGHT.down(function() {
+        player2.forward('right');
+      });
+      Keyboard.SPACE.press(function() {
+        player2.shot();
       });
     }
   }
@@ -191,7 +207,7 @@
       graphics: this.graphics,
       screen: this.screen,
       playerNum: playerNum,
-      enemyNum: 19,
+      enemyNum: 20,
       offsetX: this.screen.offsetX + this.graphics['tile'].height * 13 * this.screen.scale + 15 * this.screen.scale,
       offsetY: this.screen.offsetY + 15 * this.screen.scale
     }));
@@ -238,15 +254,15 @@
 
   proto.welcomeAnim = function(playerNum) {
     var that = this;
-    var width = that.screen.width * that.screen.scale;
-    var height = that.screen.height * that.screen.scale / 2;
+    var width = that.screen.width;
+    var height = that.screen.height / 2;
     var diff = 0;
     var counter = 0;
     var anim = new Animation({
     });
     anim.draw = function(ctx) {
       if (height - diff === 0) return;
-      if (height - diff === 50) {
+      if (height - diff === 50 * that.screen.scale) {
         that.initBoard(playerNum);
       };
       ctx.save();
@@ -254,13 +270,13 @@
       ctx.fillRect(0, 0, width, height - diff);
       ctx.fillRect(0, height + diff, width, height - diff);
       ctx.restore();
-      if (counter < 30) {
+      if (counter < 20 * that.screen.scale) {
         ctx.save();
         ctx.translate(that.screen.width / 2, that.screen.height / 2);
         ctx.drawImage(that.graphics.num.image, 0, 0, that.graphics.num.width / 10, that.graphics.num.height, 0, 0, that.graphics.num.width / 10 * that.screen.scale, that.graphics.num.height * that.screen.scale);
         ctx.restore();
       } else {
-        diff += 5;
+        diff += 5 * that.screen.scale;
       }
       counter ++;
     }
