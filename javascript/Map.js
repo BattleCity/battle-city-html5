@@ -21,24 +21,24 @@
 
   var proto = {};
 
-  proto.drawBackground = function(ctx) {
-    ctx.fillStyle = '#7f7f7f';
-    ctx.fillRect(0, 0, this.width, this.height);
-    ctx.fillStyle = '#000';
-    ctx.fillRect(this.offsetX, this.offsetY, this.cellWidth * 26 * this.scale, this.cellWidth * 26 * this.scale);
+  proto.drawBackground = function(screen) {
+    screen.ctx.fillStyle = '#7f7f7f';
+    screen.ctx.fillRect(0, 0, this.width, this.height);
+    screen.ctx.fillStyle = '#000';
+    screen.ctx.fillRect(this.offsetX, this.offsetY, this.cellWidth * 26 * this.scale, this.cellWidth * 26 * this.scale);
   }
 
-  proto.draw = function(ctx) {
+  proto.draw = function(screen) {
     var that = this;
     if(this.layer === 0) {
-      this.drawBackground(ctx);
+      this.drawBackground(screen);
     }
     Util.each(this.map, function(i, y) {
       Util.each(i, function(j, x) {
         var width = that.cellWidth * that.scale;
         var height = that.cellWidth * that.scale;
-        ctx.save();
-        ctx.translate(width * x + that.offsetX, height * y + that.offsetY);
+        screen.ctx.save();
+        screen.ctx.translate(width * x + that.offsetX, height * y + that.offsetY);
         var posX = -1;
         var posY = -1;
 
@@ -85,8 +85,8 @@
               break;
           }
         }
-        ctx.drawImage(that.image, posX * 2 * that.cellWidth, posY * 2 * that.cellWidth, that.cellWidth, that.cellWidth, 0, 0, width, height);
-        ctx.restore();
+        screen.ctx.drawImage(that.image, posX * 2 * that.cellWidth, posY * 2 * that.cellWidth, that.cellWidth, that.cellWidth, 0, 0, width, height);
+        screen.ctx.restore();
       })
     })
   }

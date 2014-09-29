@@ -1,123 +1,112 @@
 'use strict';
 
 (function(exports, undefined) {
-  function Application(options) {
-    var opt = {
-      screen: null,
-      resource: null,
-      index: 0,
-      debug: false,
-      player1: 3,
-      player2: 3,
-      enemy: 20
-    };
-    Util.merge(opt, options);
-    Util.merge(this, opt);
-    this.graphics = this.graphics;
-    this.sounds = this.sounds;
-    this.welcome();
-    this.init();
-  }
+  var logger = new Logger();
 
-  var proto = {};
-
-  proto.init = function() {
-    Keyboard.run(function () {
-      Keyboard.simulate();
-    });
-  }
-
-  proto.welcome = function() {
+  function _welcomeSplashAnim(offsetX, offsetY, height, speed) {
+    logger.info('Welcome splash animation start.');
     var that = this;
-    this.screen.clean();
-    var scale = this.screen.scale;
-    var playerNum = 1;
-    var welcoming = true;
-    var startround = false;
-    var splashOffsetX = (DEFAULTWIDTH - this.graphics.splash.width) / 2;
-    var splashOffsetY = 120;
-    var moveHeight = 400;
-
-    var moveSpeed = 2;
-
-    var splash = new Sprite({
-      image: this.graphics.splash.image,
-      offsetX: splashOffsetX,
-      offsetY: moveHeight,
-      width: this.graphics.splash.width,
-      height: this.graphics.splash.height,
-      scale: scale
+    var graphics = this.graphics['splash'];
+    this.splash = new Sprite({
+      image: graphics.image,
+      offsetX: offsetX,
+      offsetY: height,
+      width: graphics.width,
+      height: graphics.height,
+      scale: this.screen.scale
     });
 
-    splash.update = function() {
-      if (this.offsetY > splashOffsetY) this.offsetY -= moveSpeed;
+    this.splash.update = function() {
+      if (this.offsetY > offsetY) this.offsetY -= speed * that.screen.scale;
     }
-    this.screen.add(splash);
+    this.screen.add(this.splash);
+  }
 
-    var playerOffsetX = splashOffsetX + 70;
-    var playerOffsetY = splashOffsetY + 170;
-    this.playerWidth = this.graphics.player1.width / 8;
-    this.playerHeight = this.graphics.player1.height / 4;
+  function _welcomePlayerAnim(offsetX, offsetY, height, speed) {
+    logger.info('Welcome player animation start.');
+    var that = this;
+    var graphics = this.graphics['player1'];
+    var playerOffsetX = offsetX + 70;
+    var playerOffsetY = offsetY + 170;
+    this.playerWidth = graphics.width / 8;
+    this.playerHeight = graphics.height / 4;
 
     this.player = new Sprite({
-      image: this.graphics.player1.image,
+      image: graphics.image,
       x: 0,
       y: 1,
-      scale: scale,
+      scale: this.screen.scale,
       width: this.playerWidth,
       height: this.playerHeight,
       offsetX: playerOffsetX,
-      offsetY: moveHeight + 170
+      offsetY: height + 170
     });
 
     this.player.update = function() {
       this.x = this.x ? 0 : 1;
 
-      if (!welcoming) {
-        this.offsetY = playerOffsetY + (playerNum === 2 ? 30 : 0);
+      if (that.get('status') === 'select') {
+        this.offsetY = playerOffsetY + (that.playerNum === 2 ? 30 : 0);
         return;
       }
 
       if (this.offsetY > playerOffsetY ) {
-        this.offsetY -= moveSpeed;
-      } else {
-        welcoming = false;
+        this.offsetY -= speed * that.screen.scale;
       }
     }
 
     this.screen.add(this.player);
+  }
 
-    
-
+  function _welcomeBindEvent(offsetY) {
+    var that = this;
     Util.bind('keydown', function(e) {
-      if (startround) return;
-      if (welcoming) {
-        splash.offsetY = splashOffsetY;
-        that.player.offsetY = playerOffsetY;
-        welcoming = false;
+      var status = that.get('status');
+
+      if (status === 'start') return;
+
+      if (status === 'welcome') {
+        that.splash.offsetY = offsetY;
+        that.player.offsetY = offsetY + 170;
+        that.set('status', 'select');
         return;
       }
 
       if (e.keyCode === Keyboard.DOWN.keyCode) {
-        playerNum = 2;
+        that.playerNum = 2;
       } else if (e.keyCode === Keyboard.UP.keyCode) {
-        playerNum = 1;
+        that.playerNum = 1;
       } else if (e.keyCode === Keyboard.ENTER.keyCode) {
-        that.start(playerNum);
+        that.start();
       }
     });
   }
 
-  proto.initPlayer = function(playerNum, map) {
-    var scale = this.screen.scale;
+  function _welcome() {
+    logger.info('Welcome to tank.');
+
+    this.set('status', 'welcome');
+    this.screen.clean();
+
+    var offsetX = (DEFAULTWIDTH - this.graphics['splash'].width) / 2;
+    var offsetY = 120;
+    var moveHeight = 500;
+    var speed = 4;
+
+    _welcomeSplashAnim.call(this, offsetX, offsetY, moveHeight, speed);
+    _welcomePlayerAnim.call(this, offsetX, offsetY, moveHeight, speed);
+    _welcomeBindEvent.call(this, offsetY);
+  }
+
+  function _initPlayer(map) {
 
     var player1 = new Player({
-      image: this.graphics.player1.image,
-      scale: scale,
+      image: this.graphics['player1'].image,
+      scale: this.screen.scale,
       width: this.playerWidth,
       height: this.playerHeight,
-      offsetX: this.screen.offsetX / scale + 2,
-      offsetY: this.screen.offsetY / scale + 2,
+      offsetX: this.screen.offsetX / this.screen.scale + 2,
+      offsetY: this.screen.offsetY / this.screen.scale + 2,
       x: 0,
       y: 0,
       map: map,
@@ -153,14 +142,14 @@
       player1.shot();
      });
 
-    if (playerNum === 2) {
+    if (this.playerNum === 2) {
       var player2 = new Player({
-        image: this.graphics.player2.image,
-        scale: scale,
+        image: this.graphics['player2'].image,
+        scale: this.screen.scale,
         width: this.playerWidth,
         height: this.playerHeight,
-        offsetX: this.screen.offsetX / scale + 2,
-        offsetY: this.screen.offsetY / scale + 2,
+        offsetX: this.screen.offsetX / this.screen.scale + 2,
+        offsetY: this.screen.offsetY / this.screen.scale + 2,
         x: 0,
         y: 0,
         map: map,
@@ -197,23 +186,22 @@
     }
   }
 
-  proto.initEnemy = function(map) {
-  
+  function _initEnemy() {
   }
 
-  proto.initBoard = function(playerNum) {
+  function _initBoard() {
     this.screen.add(new Board({
       scale: this.screen.scale,
       graphics: this.graphics,
       screen: this.screen,
-      playerNum: playerNum,
+      playerNum: this.playerNum,
       enemyNum: 20,
       offsetX: this.screen.offsetX + this.graphics['tile'].height * 13 * this.screen.scale + 15 * this.screen.scale,
       offsetY: this.screen.offsetY + 15 * this.screen.scale
     }));
   }
 
-  proto.mapRenderLayer0 = function(map) {
+  function _mapRenderLayer0(map) {
     this.screen.add(new Map({
       layer: 0,
       map: map,
@@ -227,7 +215,7 @@
     }));
   }
 
-  proto.mapRenderLayer1 = function(map) {
+  function _mapRenderLayer1(map) {
     this.screen.add(new Map({
       layer: 1,
       map: map,
@@ -241,40 +229,30 @@
     }));
   }
 
-  proto.start = function(playerNum) {
-    this.screen.clean();
-    this.sounds['start'].sound.play();
-    var map = Resource.MAPS[1];
-    this.mapRenderLayer0(map);
-    this.initPlayer(playerNum, map);
-    this.initEnemy(map);
-    this.mapRenderLayer1(map);
-    this.welcomeAnim(playerNum);
-  }
 
-  proto.welcomeAnim = function(playerNum) {
+  function _welcomeAnim() {
     var that = this;
     var width = that.screen.width;
     var height = that.screen.height / 2;
     var diff = 0;
     var counter = 0;
-    var anim = new Animation({
+    var anim = new DisplayObject({
     });
-    anim.draw = function(ctx) {
+    anim.draw = function(screen) {
       if (height - diff === 0) return;
       if (height - diff === 50 * that.screen.scale) {
-        that.initBoard(playerNum);
+        _initBoard.call(that, that.playerNum);
       };
-      ctx.save();
-      ctx.fillStyle='#7f7f7f';
-      ctx.fillRect(0, 0, width, height - diff);
-      ctx.fillRect(0, height + diff, width, height - diff);
-      ctx.restore();
+      screen.ctx.save();
+      screen.ctx.fillStyle='#7f7f7f';
+      screen.ctx.fillRect(0, 0, width, height - diff);
+      screen.ctx.fillRect(0, height + diff, width, height - diff);
+      screen.ctx.restore();
       if (counter < 20 * that.screen.scale) {
-        ctx.save();
-        ctx.translate(that.screen.width / 2, that.screen.height / 2);
-        ctx.drawImage(that.graphics.num.image, 0, 0, that.graphics.num.width / 10, that.graphics.num.height, 0, 0, that.graphics.num.width / 10 * that.screen.scale, that.graphics.num.height * that.screen.scale);
-        ctx.restore();
+        screen.ctx.save();
+        screen.ctx.translate(that.screen.width / 2, that.screen.height / 2);
+        screen.ctx.drawImage(that.graphics['num'].image, 0, 0, that.graphics['num'].width / 10, that.graphics['num'].height, 0, 0, that.graphics['num'].width / 10 * that.screen.scale, that.graphics['num'].height * that.screen.scale);
+        screen.ctx.restore();
       } else {
         diff += 5 * that.screen.scale;
       }
@@ -283,18 +261,56 @@
     this.screen.add(anim);
   }
 
-  proto.pause = function() {
 
+  function Application(options) {
+    Application.sup.call(this);
+    var opt = {
+      screen: null,
+      graphics: null,
+      sounds: null,
+      stage: 0,
+      player1: 3,
+      player2: 3,
+      enemy: 20,
+      playerNum: 1
+    };
+    Util.merge(opt, options);
+    Util.merge(this, opt);
+  }
+
+  var proto = {};
+
+  proto.init = function() {
+    logger.info('Application initial.');
+    Keyboard.run(function () {
+      Keyboard.simulate();
+    });
+    _welcome.call(this);
+  }
+
+  proto.start = function() {
+    this.screen.clean();
+    this.sounds['start'].sound.play();
+    var map = Resource.MAPS[1];
+    _mapRenderLayer0.call(this, map);
+    _initPlayer.call(this, map);
+    _initEnemy.call(this, map);
+    _mapRenderLayer1.call(this, map);
+    _welcomeAnim.call(this);
+  }
+
+  proto.pause = function() {
   }
 
   proto.restart = function() {
-
+    this.end();
+    this.init();
   }
 
   proto.end = function() {
-
   }
 
   Util.augment(Application, proto);
+  Util.inherit(Application, Base);
   exports.Application = Application;
 })(this);

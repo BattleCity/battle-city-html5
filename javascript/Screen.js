@@ -9,14 +9,14 @@
     this.height = DEFAULTHEIGHT * this.scale;
     this.offsetX = this.width / 25;
     this.offsetY = this.height / 12.5;
-    this.displayObjectList = [];
+    this._displayList = [];
     this.init();
   }
 
   var proto = {};
 
   proto.init = function() {
-    if (!this.element) return;
+    if (!this.element) throw new Error('lack of screen element.');
     this.ctx = this.element.getContext('2d');
     this.element.width = this.width;
     this.element.height = this.height;
@@ -28,18 +28,22 @@
 
   proto.update = function() {
     var that = this;
+    var tempArr = [];
     this.clear();
-    Util.each(this.displayObjectList, function(i) {
-      i.draw(that.ctx);
+    Util.each(this._displayList, function(i) {
+      if (i.destroyed) return;
+      tempArr.push(i);
+      i.draw && i.draw(that);
     });
+    this._displayList = tempArr;
   }
 
   proto.add = function(item) {
-    this.displayObjectList.push(item);
+    this._displayList.push(item);
   }
 
   proto.clean = function() {
-    this.displayObjectList = [];
+    this._displayList = [];
   }
 
   Util.augment(Screen, proto);

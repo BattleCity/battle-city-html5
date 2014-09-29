@@ -73,9 +73,9 @@
   proto.shot = function() {
     this.sounds['fire'].sound.play();
     this.screen.add(new Bullet({
-      image: this.graphics.bullet.image,
-      width: this.graphics.bullet.width / 4,
-      height: this.graphics.bullet.height,
+      image: this.graphics['bullet'].image,
+      width: this.graphics['bullet'].width / 4,
+      height: this.graphics['bullet'].height,
       x: 0,
       y: 0,
       offsetX: this.offsetX,
@@ -87,10 +87,9 @@
   }
 
   proto.shield = function() {
-    var image = this.graphics.shield.image;
-    var width = this.graphics.shield.width;
-    var height = this.graphics.shield.height;
-    
+    var image = this.graphics['shield'].image;
+    var width = this.graphics['shield'].width;
+    var height = this.graphics['shield'].height;
   }
 
   Util.augment(Tank, proto);

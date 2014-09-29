@@ -11,14 +11,9 @@
     Util.merge(opt, options);
     Util.merge(this, opt);
     Bullet.sup.call(this, opt);
-    this.init();
   }
 
   var proto = {};
-
-  proto.init = function() {
-    
-  }
 
   proto.update = function() {
     switch (this.direction) {
@@ -39,9 +34,6 @@
         this.x = 1;
         break;
     }
-  }
-
-  proto.destroy = function() {
   }
 
   Util.augment(Bullet, proto);

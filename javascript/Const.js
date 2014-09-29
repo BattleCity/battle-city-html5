@@ -1,8 +1,8 @@
 'use strict';
 
 (function(exports, undefined) {
-  exports.SCREENWIDTH = 500;
-  exports.SCREENHEIGHT = 500;
+  exports.SCREENWIDTH = 300;
+  exports.SCREENHEIGHT = 300;
   exports.DEFAULTWIDTH = 500;
   exports.DEFAULTHEIGHT = 500;
   exports.STARTSTAGE = 1;
