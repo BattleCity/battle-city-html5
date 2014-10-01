@@ -139,17 +139,42 @@
 
   proto.shot = function() {
     this.sounds['fire'].sound.play();
+    var graphics = this.graphics['bullet'];
+
+    switch (this.direction) {
+      case 'up':
+        var offsetX = this.offsetX + this.width / 2 - graphics.width / 8;
+        var offsetY = this.offsetY;
+        break;
+      case 'down':
+        var offsetX = this.offsetX + this.width / 2 - graphics.width / 8;
+        var offsetY = this.offsetY + this.width;
+        break;
+      case 'left':
+        var offsetX = this.offsetX;
+        var offsetY = this.offsetY + this.width / 2 - graphics.width / 8;
+        break;
+      case 'right':
+        var offsetX = this.offsetX + this.width;
+        var offsetY = this.offsetY + this.width / 2 - graphics.width / 8;
+        break;
+    }
+
     this.screen.add(new Bullet({
-      image: this.graphics['bullet'].image,
-      width: this.graphics['bullet'].width / 4,
-      height: this.graphics['bullet'].height,
+      image: graphics.image,
+      width: graphics.width / 4,
+      height: graphics.height,
       x: 0,
       y: 0,
-      offsetX: this.offsetX,
-      offsetY: this.offsetY,
+      offsetX: offsetX,
+      offsetY: offsetY,
       scale: this.scale,
       direction: this.direction,
-      speed: 2
+      speed: 3,
+      screen: this.screen,
+      cellWidth: this.cellWidth,
+      sounds: this.sounds,
+      graphics: this.graphics
     }));
   }
 

@@ -17,12 +17,10 @@
   var HOME4 = 9;
 
   function _hitTest(xleft, yleft, xright, yright) {
+    if (!this.map[yleft] || !this.map[yright]) return true;
+
     var pleft = this.map[yleft][xleft];
     var pright = this.map[yright][xright];
-    logger.info('yleft: ' + yleft);
-    logger.info('xleft: ' + xleft);
-    logger.info('yright: ' + yright);
-    logger.info('xright: ' + xright);
     return pleft === WALL
       || pright === WALL
       || pleft === STEEL

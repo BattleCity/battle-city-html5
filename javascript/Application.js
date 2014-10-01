@@ -100,6 +100,7 @@
 
   function _initPlayer() {
     var that = this;
+    var isRunning = false;
     this.player1 = new Player({
       image: this.graphics['player1'].image,
       scale: this.screen.scale,
@@ -131,18 +132,18 @@
     Keyboard.S.down(function() {
       that.player1.forward('down');
     });
-     Keyboard.W.down(function() {
+    Keyboard.W.down(function() {
       that.player1.forward('up');
-     });
-     Keyboard.A.down(function() {
+    });
+    Keyboard.A.down(function() {
       that.player1.forward('left');
-     });
-     Keyboard.D.down(function() {
+    });
+    Keyboard.D.down(function() {
       that.player1.forward('right');
-     });
-     Keyboard.SPACE.press(function() {
+    });
+    Keyboard.SPACE.down(function() {
       that.player1.shot();
-     });
+    });
 
     if (this.playerNum === 2) {
       this.player2 = new Player({
@@ -185,7 +186,7 @@
       Keyboard.RIGHT.down(function() {
         that.player2.forward('right');
       });
-      Keyboard.SPACE.press(function() {
+      Keyboard.SPACE.down(function() {
         that.player2.shot();
       });
     }

@@ -3,7 +3,9 @@
 (function(exports, undefined) {
 
   var GRAPHICS = 'bonus bore bullet enemy explode1 explode2 flag gameover misc num player1 player2 shield splash tile'.split(' ');
-  var SOUNDS = 'add blast eat end enemy fire lose move start'.split(' ');
+  var SOUNDS = 'add appear blast dead eat end enemy explosion fire hitit hitnone lose move pause start statistics'.split(' ');
+
+
 
   var map1 = [
     [0,0,0,0,0,0,2,2,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0],
