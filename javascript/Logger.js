@@ -24,6 +24,7 @@
     if (!DEBUG) return;
     var contents = Util.slice.call(arguments).join('\n');
     var font = this.fontWeight + ' ' + this.fontStyle + ' ' + this.fontSize + 'px ' + this.fontFace;
+
     if (this.screen) {
       this.screen.ctx.clearRect(0, 0, this.screen.width, this.screen.height);
       this.screen.ctx.fillStyle = this.fillStyle;

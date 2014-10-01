@@ -50,7 +50,7 @@
         return;
       }
 
-      if (this.offsetY > playerOffsetY ) {
+      if (this.offsetY > playerOffsetY) {
         this.offsetY -= speed * that.screen.scale;
       }
     }
@@ -98,9 +98,9 @@
     _welcomeBindEvent.call(this, offsetY);
   }
 
-  function _initPlayer(map) {
-
-    var player1 = new Player({
+  function _initPlayer() {
+    var that = this;
+    this.player1 = new Player({
       image: this.graphics['player1'].image,
       scale: this.screen.scale,
       width: this.playerWidth,
@@ -109,41 +109,43 @@
       offsetY: this.screen.offsetY / this.screen.scale + 2,
       x: 0,
       y: 0,
-      map: map,
+      map: this.mapLayerBottom,
       position: {
         x: 8,
         y: 24
       },
       speed: 1,
-      cellWidth: this.graphics['tile'].height / 2,
+      level: 0,
+      cellWidth: this.cellWidth,
       screen: this.screen,
       graphics: this.graphics,
       sounds: this.sounds
     });
 
-    player1.update = function() {
-      player1.run();
+    this.player1.update = function() {
+      this.run();
     }
-    this.screen.add(player1);
+
+    this.screen.add(this.player1);
 
     Keyboard.S.down(function() {
-      player1.forward('down');
+      that.player1.forward('down');
     });
      Keyboard.W.down(function() {
-      player1.forward('up');
+      that.player1.forward('up');
      });
      Keyboard.A.down(function() {
-      player1.forward('left');
+      that.player1.forward('left');
      });
      Keyboard.D.down(function() {
-      player1.forward('right');
+      that.player1.forward('right');
      });
      Keyboard.SPACE.press(function() {
-      player1.shot();
+      that.player1.shot();
      });
 
     if (this.playerNum === 2) {
-      var player2 = new Player({
+      this.player2 = new Player({
         image: this.graphics['player2'].image,
         scale: this.screen.scale,
         width: this.playerWidth,
@@ -152,36 +154,39 @@
         offsetY: this.screen.offsetY / this.screen.scale + 2,
         x: 0,
         y: 0,
-        map: map,
+        map: this.mapLayerBottom,
         position: {
           x: 16,
           y: 24
         },
-        cellWidth: this.graphics['tile'].height / 2,
+        level: 0,
+        speed: 2,
+        cellWidth: this.cellWidth,
         screen: this.screen,
         graphics: this.graphics,
         sounds: this.sounds
       });
 
-      player2.update = function() {
-        player2.run();
+      this.player2.update = function() {
+        this.run();
       }
-      this.screen.add(player2);
+
+      this.screen.add(this.player2);
 
       Keyboard.DOWN.down(function() {
-        player2.forward('down');
+        that.player2.forward('down');
       });
       Keyboard.UP.down(function() {
-        player2.forward('up');
+        that.player2.forward('up');
       });
       Keyboard.LEFT.down(function() {
-        player2.forward('left');
+        that.player2.forward('left');
       });
       Keyboard.RIGHT.down(function() {
-        player2.forward('right');
+        that.player2.forward('right');
       });
       Keyboard.SPACE.press(function() {
-        player2.shot();
+        that.player2.shot();
       });
     }
   }
@@ -195,66 +200,77 @@
       graphics: this.graphics,
       screen: this.screen,
       playerNum: this.playerNum,
-      enemyNum: 20,
-      offsetX: this.screen.offsetX + this.graphics['tile'].height * 13 * this.screen.scale + 15 * this.screen.scale,
+      enemyNum: this.enemy,
+      offsetX: this.screen.offsetX + this.cellWidth * 26 * this.screen.scale + 15 * this.screen.scale,
       offsetY: this.screen.offsetY + 15 * this.screen.scale
     }));
   }
 
-  function _mapRenderLayer0(map) {
-    this.screen.add(new Map({
+  function _mapRenderLayerBottom() {
+    logger.info('Render bottom map.');
+    var graphics = this.graphics['tile'];
+    this.mapLayerBottom = new Map({
       layer: 0,
-      map: map,
+      map: this.map,
       width: this.screen.width,
       height: this.screen.height,
-      cellWidth: this.graphics['tile'].height / 2,
+      cellWidth: this.cellWidth,
       offsetX: this.screen.offsetX,
       offsetY: this.screen.offsetY,
-      image: this.graphics['tile'].image,
+      image: graphics.image,
       scale: this.screen.scale
-    }));
+    });
+    this.screen.add(this.mapLayerBottom);
   }
 
-  function _mapRenderLayer1(map) {
+  function _mapRenderLayerTop() {
+    logger.info('Render top map.');
+    var graphics = this.graphics['tile'];
     this.screen.add(new Map({
       layer: 1,
-      map: map,
+      map: this.map,
       width: this.screen.width,
       height: this.screen.height,
-      cellWidth: this.graphics['tile'].height / 2,
+      cellWidth: this.cellWidth,
       offsetX: this.screen.offsetX,
       offsetY: this.screen.offsetY,
-      image: this.graphics['tile'].image,
+      image: graphics.image,
       scale: this.screen.scale
     }));
   }
 
-
-  function _welcomeAnim() {
+  function _stageAnim() {
     var that = this;
     var width = that.screen.width;
     var height = that.screen.height / 2;
+    var scale = that.screen.scale;
     var diff = 0;
     var counter = 0;
-    var anim = new DisplayObject({
-    });
+    var graphics = this.graphics['num'];
+    var anim = new DisplayObject({});
+
+    setTimeout(function() {
+      _initBoard.call(that);
+    }, 800);
+
     anim.draw = function(screen) {
-      if (height - diff === 0) return;
-      if (height - diff === 50 * that.screen.scale) {
-        _initBoard.call(that, that.playerNum);
+      if (parseInt(height - diff) === that.screen.offsetY) {
+        this.destroy();
       };
+
       screen.ctx.save();
       screen.ctx.fillStyle='#7f7f7f';
       screen.ctx.fillRect(0, 0, width, height - diff);
       screen.ctx.fillRect(0, height + diff, width, height - diff);
       screen.ctx.restore();
-      if (counter < 20 * that.screen.scale) {
+
+      if (counter < 20 * scale) {
         screen.ctx.save();
         screen.ctx.translate(that.screen.width / 2, that.screen.height / 2);
-        screen.ctx.drawImage(that.graphics['num'].image, 0, 0, that.graphics['num'].width / 10, that.graphics['num'].height, 0, 0, that.graphics['num'].width / 10 * that.screen.scale, that.graphics['num'].height * that.screen.scale);
+        screen.ctx.drawImage(graphics.image, 0, 0, graphics.width / 10, graphics.height, 0, 0, graphics.width / 10 * scale, graphics.height * scale);
         screen.ctx.restore();
       } else {
-        diff += 5 * that.screen.scale;
+        diff += 5 * scale;
       }
       counter ++;
     }
@@ -272,16 +288,19 @@
       player1: 3,
       player2: 3,
       enemy: 20,
-      playerNum: 1
+      playerNum: 1,
+      cellWidth: 0
     };
     Util.merge(opt, options);
     Util.merge(this, opt);
+    window.sss = this.screen;
   }
 
   var proto = {};
 
   proto.init = function() {
     logger.info('Application initial.');
+    this.cellWidth = this.graphics['tile'].height / 2;
     Keyboard.run(function () {
       Keyboard.simulate();
     });
@@ -289,14 +308,16 @@
   }
 
   proto.start = function() {
+    logger.info('Application start.');
     this.screen.clean();
     this.sounds['start'].sound.play();
-    var map = Resource.MAPS[1];
-    _mapRenderLayer0.call(this, map);
-    _initPlayer.call(this, map);
-    _initEnemy.call(this, map);
-    _mapRenderLayer1.call(this, map);
-    _welcomeAnim.call(this);
+    this.map = Resource.MAPS[this.stage];
+    logger.info('Stage ' + this.stage + ' start.');
+    _mapRenderLayerBottom.call(this);
+    _initPlayer.call(this);
+    _initEnemy.call(this);
+    _mapRenderLayerTop.call(this);
+    _stageAnim.call(this);
   }
 
   proto.pause = function() {

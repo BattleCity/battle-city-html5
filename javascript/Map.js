@@ -2,6 +2,7 @@
 
 (function(exports, undefined) {
   // static
+  var logger = new Logger();
 
 	var NONE = 0;
 	var WALL = 1;
@@ -15,24 +16,39 @@
   var HOME3 = 8;
   var HOME4 = 9;
 
-  function Map(options) {
-    Util.merge(this, options);
+  function _hitTest(xleft, yleft, xright, yright) {
+    var pleft = this.map[yleft][xleft];
+    var pright = this.map[yright][xright];
+    logger.info('yleft: ' + yleft);
+    logger.info('xleft: ' + xleft);
+    logger.info('yright: ' + yright);
+    logger.info('xright: ' + xright);
+    return pleft === WALL
+      || pright === WALL
+      || pleft === STEEL
+      || pright === STEEL;
   }
 
-  var proto = {};
-
-  proto.drawBackground = function(screen) {
+  function _drawBackground(screen) {
     screen.ctx.fillStyle = '#7f7f7f';
     screen.ctx.fillRect(0, 0, this.width, this.height);
     screen.ctx.fillStyle = '#000';
     screen.ctx.fillRect(this.offsetX, this.offsetY, this.cellWidth * 26 * this.scale, this.cellWidth * 26 * this.scale);
   }
 
+  function Map(options) {
+    var opt = {};
+    Util.merge(opt, options);
+    Util.merge(this, opt);
+  }
+
+  var proto = {};
+
   proto.draw = function(screen) {
     var that = this;
-    if(this.layer === 0) {
-      this.drawBackground(screen);
-    }
+
+    if(this.layer === 0) _drawBackground.call(this, screen);
+
     Util.each(this.map, function(i, y) {
       Util.each(i, function(j, x) {
         var width = that.cellWidth * that.scale;
@@ -91,8 +107,9 @@
     })
   }
 
-  proto.update = function() {}
-
+  proto.hitTest = function(x1, y1, x2, y2) {
+    return _hitTest.call(this, x1, y1, x2, y2);
+  }
 
   Util.augment(Map, proto);
   exports.Map = Map;

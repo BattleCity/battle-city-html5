@@ -32,10 +32,10 @@
   }
 
   function _hitTest(obj) {
-    var minx = this.x > obj.x ? this.x :obj.x;
-    var maxx = this.x + this.width < obj.x + obj.width ? this.x + this.width : obj.x + obj.width;
-    var miny = this.y > obj.y ? this.y : obj.y;
-    var maxy = this.y + this.width < obj.y + obj.width ? this.y + this.width : obj.y + obj.width;
+    var minx = this.offsetX > obj.offsetX ? this.offsetX : obj.offsetX;
+    var maxx = this.offsetX + this.width < obj.offsetX + obj.width ? this.offsetX + this.width : obj.offsetX + obj.width;
+    var miny = this.offsetY > obj.offsetY ? this.offsetY : obj.offsetY;
+    var maxy = this.offsetY + this.width < obj.offsetY + obj.width ? this.offsetY + this.width : obj.offsetY + obj.width;
     return minx <= maxx && miny <= maxy;
   }
 
@@ -56,7 +56,7 @@
   }
 
   proto.hitTest = function(obj) {
-    _hitTest.call(this, obj);
+    return _hitTest.call(this, obj);
   }
 
   proto.update = function(screen) {

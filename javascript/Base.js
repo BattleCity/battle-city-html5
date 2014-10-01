@@ -3,7 +3,7 @@
 (function(exports, undefined) {
 
   function _emit(type, data) {
-    var handlers = Util.slice.call(this.NotifyHash[type]);
+    var handlers = Util.slice.call(this._notifyHash[type]);
 
     for (var i = 0, l = handlers.length; i < l; i++) {
       var j = Util.extend({}, handlers[i]);
@@ -14,11 +14,11 @@
   };
 
   function _detach(type) {
-    var handlers = this.NotifyHash;
+    var handlers = this._notifyHash;
     if (type) {
       delete handlers[type];
     } else {
-      this.NotifyHash = {};
+      this._notifyHash = {};
     }
   };
 
@@ -27,10 +27,10 @@
     for (var i = 0, l = events.length; i < l; i++) {
       var t = events[i];
 
-      if (!this.NotifyHash[t]) {
-        this.NotifyHash[t] = [];
+      if (!this._notifyHash[t]) {
+        this._notifyHash[t] = [];
       }
-      this.NotifyHash[t].push({
+      this._notifyHash[t].push({
         'handler': handle,
         'type': t
       });
@@ -38,8 +38,8 @@
   }
 
   function Base() {
-    this.DataHash = {};
-    this.NotifyHash = {};
+    this._dataHash = {};
+    this._notifyHash = {};
   };
 
   var proto = {};
@@ -59,7 +59,7 @@
     var items = types.split(' ');
     for (var i = 0, l = items.length; i < l; i++) {
       var type = items[i];
-      if (this.NotifyHash[type]) {
+      if (this._notifyHash[type]) {
         _emit.call(this, type, Util.type(data) === 'undefined' ? null : data);
       }
     }
@@ -72,23 +72,23 @@
   };
 
   proto.set = function(id, value) {
-    this.DataHash[id] = value;
+    this._dataHash[id] = value;
   };
 
   proto.get = function(id) {
-    return this.DataHash[id];
+    return this._dataHash[id];
   };
 
   proto.has = function(id) {
-    return !!this.DataHash[id];
+    return !!this._dataHash[id];
   };
 
   proto.all = function() {
-    return this.DataHash;
+    return this._dataHash;
   };
 
   proto.remove = function(id){
-    if(this.DataHash[id]) delete this.DataHash[id];
+    if(this._dataHash[id]) delete this._dataHash[id];
   };
 
   Util.augment(Base, proto);

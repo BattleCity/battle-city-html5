@@ -38,7 +38,7 @@
   function Resource(graphics) {
     this.graphics = [];
     this.sounds = [];
-    this.maps = [null];
+    this.maps = [];
   }
 
   var proto = Resource.prototype;
