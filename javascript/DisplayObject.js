@@ -49,10 +49,28 @@
     screen.ctx.rotate(this.rotation * Math.PI / 180);
     screen.ctx.translate(this.offsetX * this.scale, this.offsetY * this.scale);
     this._draw(screen);
+    this.debugRect(screen);
     screen.ctx.restore();
   }
 
   proto._draw = function(screen) {
+  }
+
+  proto.debugRect = function(screen) {
+    if (!this.debug) return;
+    screen.ctx.save();
+    screen.ctx.lineWidth = 1;
+    screen.ctx.strokeStyle = "#fff";
+    screen.ctx.globalAlpha = 0.8;
+    screen.ctx.beginPath();
+    screen.ctx.moveTo(1, 1);
+    screen.ctx.lineTo(this.width - 1, 1);
+    screen.ctx.lineTo(this.width - 1, this.height - 1);
+    screen.ctx.lineTo(1, this.height - 1);
+    screen.ctx.lineTo(1, 1);
+    screen.ctx.stroke();
+    screen.ctx.closePath();
+    screen.ctx.restore();
   }
 
   proto.hitTest = function(obj) {

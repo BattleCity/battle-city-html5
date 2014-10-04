@@ -2,7 +2,7 @@
 
 (function(exports, undefined) {
 
-  var GRAPHICS = 'bonus bore bullet enemy explode1 explode2 flag gameover misc num player1 player2 shield splash tile'.split(' ');
+  var GRAPHICS = 'bonus born bullet enemy explode1 explode2 flag gameover misc num player1 player2 shield splash tile'.split(' ');
   var SOUNDS = 'add appear blast dead eat end enemy explosion fire hitit hitnone lose move pause start statistics'.split(' ');
 
 

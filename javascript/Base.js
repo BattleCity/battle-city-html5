@@ -4,7 +4,6 @@
 
   function _emit(type, data) {
     var handlers = Util.slice.call(this._notifyHash[type]);
-
     for (var i = 0, l = handlers.length; i < l; i++) {
       var j = Util.extend({}, handlers[i]);
       var scope = (j.scope) ? j.scope : this;
@@ -26,7 +25,6 @@
     var events = key.split(' ');
     for (var i = 0, l = events.length; i < l; i++) {
       var t = events[i];
-
       if (!this._notifyHash[t]) {
         this._notifyHash[t] = [];
       }
@@ -44,13 +42,13 @@
 
   var proto = {};
 
-  proto.on = function(arg1,arg2) {
+  proto.on = function(arg1, arg2) {
     if (Util.type(arg1) === 'object') {
       for (var j in arg1) {
-        _bind.call(this,j,arg1[j]);
+        _bind.call(this, j, arg1[j]);
       }
     } else {
-      _bind.call(this,arg1,arg2);
+      _bind.call(this, arg1, arg2);
     }
     return this;
   };

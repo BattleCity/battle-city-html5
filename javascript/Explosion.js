@@ -17,7 +17,14 @@
   }
 
   proto.boom = function() {
-    this.sounds['hitnone'].sound.play();
+    switch (this.type) {
+      case 'wall':
+        this.sounds['hitit'].sound.play();
+        break;
+      default:
+        this.sounds['hitnone'].sound.play();
+        break;
+    }
   }
 
   Util.augment(Explostion, proto);

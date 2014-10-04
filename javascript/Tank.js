@@ -2,6 +2,8 @@
 
 (function(exports, undefined) {
 
+  var logger = new Logger();
+
   function Tank(options) {
     var opt = {
       direction: 'up',
@@ -12,9 +14,11 @@
         x: 0,
         y: 0
       },
-      cellWidth: 0
+      cellWidth: 0,
+      visible: false
     };
     Util.merge(opt, options);
+    Util.merge(this, opt);
     Tank.sup.call(this, opt);
     this.init();
   }
@@ -85,7 +89,7 @@
     this.offsetX += this.position.x * this.cellWidth;
     this.offsetY += this.position.y * this.cellWidth;
     this.speed *= this.scale;
-    this.shield();
+    this.born();
   }
 
   proto.run = function() {
@@ -109,62 +113,38 @@
     }
   }
 
-  proto.forward = function(direct) {
-    var that = this;
-    this.sounds['move'].sound.play();
-
-    if (this.directtion !== direct) {
-      this.direction = direct;
-    }
-
-    switch (this.direction) {
-      case 'up':
-        if (this.test()) return;
-        this.offsetY -= this.speed;
-        break;
-      case 'down':
-        if (this.test()) return;
-        this.offsetY += this.speed;
-        break;
-      case 'left':
-        if (this.test()) return;
-        this.offsetX -= this.speed;
-        break;
-      case 'right':
-        if (this.test()) return;
-        this.offsetX += this.speed;
-        break;
-    }
-  }
-
   proto.shot = function() {
     this.sounds['fire'].sound.play();
     var graphics = this.graphics['bullet'];
-
     switch (this.direction) {
       case 'up':
         var offsetX = this.offsetX + this.width / 2 - graphics.width / 8;
         var offsetY = this.offsetY;
+        var x = 0;
         break;
       case 'down':
         var offsetX = this.offsetX + this.width / 2 - graphics.width / 8;
-        var offsetY = this.offsetY + this.width;
+        var offsetY = this.offsetY + this.width - graphics.height;
+        var x = 2;
         break;
       case 'left':
         var offsetX = this.offsetX;
         var offsetY = this.offsetY + this.width / 2 - graphics.width / 8;
+        var x = 3;
         break;
       case 'right':
-        var offsetX = this.offsetX + this.width;
+        var offsetX = this.offsetX + this.width - graphics.width / 4;
         var offsetY = this.offsetY + this.width / 2 - graphics.width / 8;
+        var x = 1;
         break;
     }
 
     this.screen.add(new Bullet({
       image: graphics.image,
+      map: this.map,
       width: graphics.width / 4,
       height: graphics.height,
-      x: 0,
+      x: x,
       y: 0,
       offsetX: offsetX,
       offsetY: offsetY,
@@ -174,14 +154,69 @@
       screen: this.screen,
       cellWidth: this.cellWidth,
       sounds: this.sounds,
-      graphics: this.graphics
+      graphics: this.graphics,
+      debug: false
     }));
   }
 
+  proto.born = function() {
+    var that = this;
+    var born = this.graphics['born'];
+    var counter = 0;
+    var bornAnim = new Sprite({
+      offsetX: this.offsetX,
+      offsetY: this.offsetY,
+      image: born.image,
+      height: born.height,
+      width: born.width / 4,
+      x: 0,
+      y: 0
+    });
+
+    bornAnim.update = function() {
+      counter ++;
+      if (counter % 10 === 0) {
+        this.x ++;
+        if (this.x === 3) this.x = 0;
+      }
+
+      if (counter === 120) {
+        this.destroy();
+        setTimeout(function() {
+          that.shield();
+        }, 16);
+      }
+    };
+    this.screen.add(bornAnim);
+  }
+
   proto.shield = function() {
-    var image = this.graphics['shield'].image;
-    var width = this.graphics['shield'].width;
-    var height = this.graphics['shield'].height;
+    var that = this;
+    var shield = this.graphics['shield'];
+    var counter = 0;
+    that.visible = true;
+    var shieldAnim = new Sprite({
+      offsetX: this.offsetX,
+      offsetY: this.offsetY,
+      image: shield.image,
+      height: shield.height / 2,
+      width: shield.width,
+      x: 0,
+      y: 0
+    });
+
+    shieldAnim.update = function() {
+      counter ++;
+      if (counter % 10 === 0) {
+        this.y = this.y === 0 ? 1 : 0;
+      }
+
+      if (counter === 80) {
+        this.destroy();
+      }
+    }
+
+    this.screen.add(shieldAnim);
   }
 
   proto.test = function() {

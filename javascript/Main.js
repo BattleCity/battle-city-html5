@@ -33,7 +33,8 @@
         index: STARTSTAGE,
         screen: screen,
         graphics: graphics,
-        sounds: sounds
+        sounds: sounds,
+        debug: DEBUG
       }).init();
 
       timer.listen(screen).start();

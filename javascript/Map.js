@@ -27,6 +27,20 @@
       || pright === STEEL;
   }
 
+  function _hitBullet(x, y) {
+    var p = this.map[y][x];
+    if (p === WALL) {
+      _hitWall.call(this, x, y);
+      return 'wall';
+    } else if (p === STEEL) {
+      return 'steel';
+    }
+  }
+
+  function _hitWall(x, y) {
+    this.map[y][x] = NONE;
+  }
+
   function _drawBackground(screen) {
     screen.ctx.fillStyle = '#7f7f7f';
     screen.ctx.fillRect(0, 0, this.width, this.height);
@@ -107,6 +121,10 @@
 
   proto.hitTest = function(x1, y1, x2, y2) {
     return _hitTest.call(this, x1, y1, x2, y2);
+  }
+
+  proto.hitBullet = function(x, y) {
+    return _hitBullet.call(this, x, y);
   }
 
   Util.augment(Map, proto);

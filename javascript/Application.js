@@ -120,7 +120,8 @@
       cellWidth: this.cellWidth,
       screen: this.screen,
       graphics: this.graphics,
-      sounds: this.sounds
+      sounds: this.sounds,
+      debug: this.debug
     });
 
     this.player1.update = function() {
@@ -141,7 +142,7 @@
     Keyboard.D.down(function() {
       that.player1.forward('right');
     });
-    Keyboard.SPACE.down(function() {
+    Keyboard.SPACE.press(function() {
       that.player1.shot();
     });
 
@@ -165,7 +166,8 @@
         cellWidth: this.cellWidth,
         screen: this.screen,
         graphics: this.graphics,
-        sounds: this.sounds
+        sounds: this.sounds,
+        debug: this.debug
       });
 
       this.player2.update = function() {
@@ -193,6 +195,54 @@
   }
 
   function _initEnemy() {
+    _generateEnemy.call(this);
+  }
+
+  function _generateEnemy() {
+    var num = 3;
+    while(num--) {
+      switch (num) {
+        case 2:
+          var x = 0;
+          break;
+        case 1:
+          var x = 12;
+          break;
+        case 0:
+          var x = 24;
+          break;
+      }
+      var enemy = new Enemy({
+        image: this.graphics['enemy'].image,
+        scale: this.screen.scale,
+        width: this.playerWidth,
+        height: this.playerHeight,
+        offsetX: this.screen.offsetX / this.screen.scale + 2,
+        offsetY: this.screen.offsetY / this.screen.scale + 2,
+        x: 0,
+        y: 0,
+        map: this.mapLayerBottom,
+        position: {
+          x: x,
+          y: 0
+        },
+        direction: 'down',
+        speed: 1,
+        level: 0,
+        cellWidth: this.cellWidth,
+        screen: this.screen,
+        graphics: this.graphics,
+        sounds: this.sounds,
+        debug: this.debug
+      });
+
+      enemy.update = function() {
+        this.run();
+        this.forward();
+      }
+
+      this.screen.add(enemy);
+    }
   }
 
   function _initBoard() {
@@ -290,7 +340,8 @@
       player2: 3,
       enemy: 20,
       playerNum: 1,
-      cellWidth: 0
+      cellWidth: 0,
+      debug: false
     };
     Util.merge(opt, options);
     Util.merge(this, opt);

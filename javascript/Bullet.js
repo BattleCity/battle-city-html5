@@ -20,7 +20,25 @@
   }
 
   function _mapTest() {
-    return false;
+    var currentX = this.offsetX - this.screen.offsetX;
+    var currentY = this.offsetY - this.screen.offsetY;
+    switch (this.direction) {
+      case 'up':
+        currentY -= 1;
+        break;
+      case 'down':
+        currentY += 1;
+        break;
+      case 'left':
+        currentX -= 1;
+        break;
+      case 'right':
+        currentX += 1;
+        break;
+    }
+    var x = parseInt(currentX / this.cellWidth);
+    var y = parseInt(currentY / this.cellWidth);
+    return this.map.hitBullet(x, y);
   }
 
   function _enemyTest() {
@@ -40,7 +58,8 @@
     var opt = {
       speed: 1,
       direction: 'up',
-      y: 0
+      y: 0,
+      x: 0
     };
     Util.merge(opt, options);
     Util.merge(this, opt);
@@ -50,32 +69,31 @@
   var proto = {};
 
   proto.update = function() {
-    if (this.test()) {
-      this.destroy();
-      return new Explostion({
-        offsetX: this.offsetX,
-        offsetY: this.offsetY,
-        sounds: this.sounds,
-        graphics: this.graphics
-      })
-    }
     switch (this.direction) {
       case 'up':
         this.offsetY -= this.speed;
-        this.x = 0;
         break;
       case 'down':
         this.offsetY += this.speed;
-        this.x = 2;
         break;
       case 'left':
         this.offsetX -= this.speed;
-        this.x = 3;
         break;
       case 'right':
         this.offsetX += this.speed;
-        this.x = 1;
         break;
+    }
+
+    var hitTest = this.test();
+    if (hitTest) {
+      this.destroy();
+      new Explostion({
+        offsetX: this.offsetX,
+        offsetY: this.offsetY,
+        sounds: this.sounds,
+        graphics: this.graphics,
+        type: hitTest
+      })
     }
   }
 
