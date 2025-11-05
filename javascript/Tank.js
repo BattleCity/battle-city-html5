@@ -155,7 +155,9 @@
       cellWidth: this.cellWidth,
       sounds: this.sounds,
       graphics: this.graphics,
-      debug: false
+      debug: false,
+      owner: this,
+      ownerType: this.constructor.name === 'Player' ? 'player' : 'enemy'
     }));
   }
 
@@ -221,6 +223,17 @@
 
   proto.test = function() {
     return _hitTest.call(this);
+  }
+
+  proto.die = function() {
+    if (this.dead || !this.visible) return;
+    this.dead = true;
+    this.visible = false;
+    this.sounds['dead'].sound.play();
+    // 触发死亡事件
+    if (this.emit) {
+      this.emit('die', this);
+    }
   }
 
   Util.augment(Tank, proto);

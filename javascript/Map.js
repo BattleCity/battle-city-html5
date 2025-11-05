@@ -34,6 +34,30 @@
       return 'wall';
     } else if (p === STEEL) {
       return 'steel';
+    } else if (p === HOME1 || p === HOME2 || p === HOME3 || p === HOME4) {
+      // 基地被击中
+      _hitHome.call(this, x, y);
+      return 'home';
+    }
+    return false;
+  }
+
+  function _hitHome(x, y) {
+    // 摧毁整个基地（4个格子）
+    var homeX = x >= 12 && x <= 13 ? 12 : x;
+    var homeY = y >= 24 && y <= 25 ? 24 : y;
+    
+    // 清除基地的4个格子
+    if (this.map[homeY] && this.map[homeY + 1]) {
+      this.map[homeY][homeX] = NONE;
+      this.map[homeY][homeX + 1] = NONE;
+      this.map[homeY + 1][homeX] = NONE;
+      this.map[homeY + 1][homeX + 1] = NONE;
+    }
+    
+    // 触发基地被摧毁事件
+    if (this.onHomeDestroyed) {
+      this.onHomeDestroyed();
     }
   }
 

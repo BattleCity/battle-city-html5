@@ -41,17 +41,58 @@
     return this.map.hitBullet(x, y);
   }
 
-  function _enemyTest() {
+  function _tankTest() {
+    var that = this;
+    
+    // 检测与所有显示对象的碰撞
+    for (var i = 0; i < this.screen._displayList.length; i++) {
+      var obj = this.screen._displayList[i];
+      if (obj.destroyed || !obj.visible) continue;
+      
+      // 跳过自己、地图、爆炸效果、子弹等
+      if (obj === this || !obj.hitTest || obj === this.owner) continue;
+      
+      // 跳过非坦克对象
+      var objType = obj.constructor && obj.constructor.name;
+      if (!objType || 
+          objType === 'Map' || 
+          objType === 'Board' || 
+          objType === 'Explostion' ||
+          objType === 'Bullet' ||
+          objType === 'Sprite') {
+        continue;
+      }
+      
+      // 识别坦克类型
+      var isPlayer = objType === 'Player';
+      var isEnemy = objType === 'Enemy';
+      
+      // 检测玩家坦克（只有敌人子弹才能击中玩家）
+      if (this.ownerType === 'enemy' && isPlayer) {
+        if (this.hitTest(obj)) {
+          return { type: 'player', target: obj };
+        }
+      }
+      
+      // 检测敌人坦克（只有玩家子弹才能击中敌人）
+      if (this.ownerType === 'player' && isEnemy) {
+        if (this.hitTest(obj)) {
+          return { type: 'enemy', target: obj };
+        }
+      }
+    }
+    
     return false;
   }
 
   function _hitTest() {
     var edgeTest = _edgeTest.call(this);
-    if (edgeTest) return edgeTest;
+    if (edgeTest) return 'edge';
     var mapTest = _mapTest.call(this);
     if (mapTest) return mapTest;
-    var enemyTest = _enemyTest.call(this);
-    if (enemyTest) return enemyTest;
+    var tankTest = _tankTest.call(this);
+    if (tankTest) return tankTest;
+    return false;
   }
 
   function Bullet(options) {
@@ -59,7 +100,9 @@
       speed: 1,
       direction: 'up',
       y: 0,
-      x: 0
+      x: 0,
+      owner: null, // 子弹的发射者（玩家或敌人）
+      ownerType: null // 'player' 或 'enemy'
     };
     Util.merge(opt, options);
     Util.merge(this, opt);
@@ -69,6 +112,7 @@
   var proto = {};
 
   proto.update = function() {
+    // 移动子弹
     switch (this.direction) {
       case 'up':
         this.offsetY -= this.speed;
@@ -83,17 +127,35 @@
         this.offsetX += this.speed;
         break;
     }
-
+    
+    // 移动后检测碰撞
     var hitTest = this.test();
     if (hitTest) {
       this.destroy();
-      new Explostion({
-        offsetX: this.offsetX,
-        offsetY: this.offsetY,
-        sounds: this.sounds,
-        graphics: this.graphics,
-        type: hitTest
-      })
+      
+      // 处理击中坦克的情况
+      if (hitTest && typeof hitTest === 'object' && hitTest.type) {
+        var explosionType = hitTest.type === 'player' ? 'player' : 'enemy';
+        new Explostion({
+          offsetX: this.offsetX,
+          offsetY: this.offsetY,
+          sounds: this.sounds,
+          graphics: this.graphics,
+          screen: this.screen,
+          type: explosionType,
+          target: hitTest.target
+        });
+      } else {
+        // 击中地图障碍物
+        new Explostion({
+          offsetX: this.offsetX,
+          offsetY: this.offsetY,
+          sounds: this.sounds,
+          graphics: this.graphics,
+          screen: this.screen,
+          type: hitTest
+        });
+      }
     }
   }
 

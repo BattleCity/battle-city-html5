@@ -12,14 +12,16 @@
 
   var proto = {};
 
-  proto.showNumber = function(screen, num) {
+  proto.showNumber = function(screen, num, x, y) {
     var image = this.graphics.num.image;
     var originWidth = this.graphics.num.width / 10;
     var originHeight = this.graphics.num.height;
     var width = originWidth * this.scale;
     var height = originHeight * this.scale;
     screen.ctx.save();
-    screen.ctx.translate(this.offsetX, this.offsetY);
+    var translateX = x !== undefined ? x : this.offsetX;
+    var translateY = y !== undefined ? y : this.offsetY;
+    screen.ctx.translate(translateX, translateY);
     screen.ctx.drawImage(image, num * originWidth, 0, originWidth, originHeight, 0, 0, width, height);
     screen.ctx.restore();
   }
@@ -44,30 +46,48 @@
     var that = this;
     var cellWidth = 14;
     var image = this.graphics.misc.image;
+    
+    // 玩家1图标
     screen.ctx.save();
     screen.ctx.translate(that.offsetX, that.offsetY + 180);
     screen.ctx.drawImage(image, cellWidth * 2, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
     screen.ctx.restore();
+    
+    // 玩家1生命数
+    var player1Life = this.player1Life !== undefined ? this.player1Life : 3;
+    this.showNumber(screen, player1Life, that.offsetX + cellWidth * this.scale, that.offsetY + 180);
     screen.ctx.save();
-    screen.ctx.translate(that.offsetX + cellWidth * this.scale, that.offsetY + 180);
+    screen.ctx.translate(that.offsetX + cellWidth * this.scale * 2, that.offsetY + 180);
     screen.ctx.drawImage(image, cellWidth * 3, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
     screen.ctx.restore();
+    
+    // 玩家1坦克图标
     screen.ctx.save();
     screen.ctx.translate(that.offsetX, that.offsetY + 200);
     screen.ctx.drawImage(image, cellWidth, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
     screen.ctx.restore();
 
     if (this.playerNum === 2) {
+      // 玩家2图标
       screen.ctx.save();
-      screen.ctx.translate(that.offsetX + cellWidth * this.scale, that.offsetY + 180);
+      screen.ctx.translate(that.offsetX, that.offsetY + 240);
+      screen.ctx.drawImage(image, cellWidth * 2, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
+      screen.ctx.restore();
+      
+      // 玩家2生命数
+      var player2Life = this.player2Life !== undefined ? this.player2Life : 3;
+      this.showNumber(screen, player2Life, that.offsetX + cellWidth * this.scale, that.offsetY + 240);
+      screen.ctx.save();
+      screen.ctx.translate(that.offsetX + cellWidth * this.scale * 2, that.offsetY + 240);
       screen.ctx.drawImage(image, cellWidth * 3, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
       screen.ctx.restore();
+      
+      // 玩家2坦克图标
       screen.ctx.save();
       screen.ctx.translate(that.offsetX, that.offsetY + 260);
       screen.ctx.drawImage(image, cellWidth, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
       screen.ctx.restore();
     }
-    //this.showNumber(ctx, 1);
   }
 
   proto.stageInfo = function(screen) {
@@ -78,7 +98,13 @@
     screen.ctx.translate(that.offsetX, that.offsetY + 300);
     screen.ctx.drawImage(image, 0, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
     screen.ctx.restore();
-    //this.showNumber(ctx, 2);
+    
+    // 显示关卡数
+    var stage = this.stage !== undefined ? this.stage : 1;
+    screen.ctx.save();
+    screen.ctx.translate(that.offsetX + cellWidth * this.scale + 5, that.offsetY + 300 + 10);
+    this.showNumber(screen, stage);
+    screen.ctx.restore();
   }
 
   proto.draw = function(screen) {

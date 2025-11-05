@@ -32,11 +32,22 @@
   }
 
   function _hitTest(obj) {
-    var minx = this.offsetX > obj.offsetX ? this.offsetX : obj.offsetX;
-    var maxx = this.offsetX + this.width < obj.offsetX + obj.width ? this.offsetX + this.width : obj.offsetX + obj.width;
-    var miny = this.offsetY > obj.offsetY ? this.offsetY : obj.offsetY;
-    var maxy = this.offsetY + this.width < obj.offsetY + obj.width ? this.offsetY + this.width : obj.offsetY + obj.width;
-    return minx <= maxx && miny <= maxy;
+    // 使用缩放后的实际坐标进行碰撞检测
+    var thisX = this.offsetX * (this.scale || 1);
+    var thisY = this.offsetY * (this.scale || 1);
+    var thisW = this.width * (this.scale || 1);
+    var thisH = this.height * (this.scale || 1);
+    
+    var objX = obj.offsetX * (obj.scale || 1);
+    var objY = obj.offsetY * (obj.scale || 1);
+    var objW = obj.width * (obj.scale || 1);
+    var objH = obj.height * (obj.scale || 1);
+    
+    // AABB碰撞检测
+    return thisX < objX + objW &&
+           thisX + thisW > objX &&
+           thisY < objY + objH &&
+           thisY + thisH > objY;
   }
 
   var proto = {};

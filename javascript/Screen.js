@@ -10,6 +10,7 @@
     this.offsetX = this.width / 25;
     this.offsetY = this.height / 12.5;
     this._displayList = [];
+    this.app = null; // 关联的Application实例
     this.init();
   }
 
@@ -30,9 +31,19 @@
     var that = this;
     var tempArr = [];
     this.clear();
+    
+    // 检查游戏状态，如果暂停则不更新对象
+    var isPaused = this.app && this.app.get('status') === 'paused';
+    
     Util.each(this._displayList, function(i) {
       if (i.destroyed) return;
       tempArr.push(i);
+      
+      // 如果游戏暂停，只绘制不更新
+      if (!isPaused && i.update) {
+        i.update(that);
+      }
+      
       i.draw && i.draw(that);
     });
     this._displayList = tempArr;
