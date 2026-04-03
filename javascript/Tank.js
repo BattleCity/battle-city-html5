@@ -155,6 +155,7 @@
       cellWidth: this.cellWidth,
       sounds: this.sounds,
       graphics: this.graphics,
+      from: this.type,
       debug: false
     }));
   }
