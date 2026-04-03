@@ -13,7 +13,8 @@
   function Enemy(options) {
     var opt = {
       level: 0,
-      fire: true
+      fire: true,
+      type: 'enemy'
     };
     Util.merge(opt, options);
     Util.merge(this, opt);

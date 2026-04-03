@@ -27,14 +27,27 @@
       || pright === STEEL;
   }
 
-  function _hitBullet(x, y) {
-    var p = this.map[y][x];
-    if (p === WALL) {
-      _hitWall.call(this, x, y);
-      return 'wall';
-    } else if (p === STEEL) {
-      return 'steel';
+  function _hitBullet(x, y, direction) {
+    var x0 = Math.floor(x / 2) * 2;
+    var y0 = Math.floor(y / 2) * 2;
+    var cells = [
+      [x0, y0], [x0 + 1, y0],
+      [x0, y0 + 1], [x0 + 1, y0 + 1]
+    ];
+
+    var result = null;
+    for (var i = 0; i < cells.length; i++) {
+      var cx = cells[i][0], cy = cells[i][1];
+      if (!this.map[cy] || this.map[cy][cx] === undefined) continue;
+      var p = this.map[cy][cx];
+      if (p === WALL) {
+        _hitWall.call(this, cx, cy);
+        result = 'wall';
+      } else if (p === STEEL && !result) {
+        result = 'steel';
+      }
     }
+    return result;
   }
 
   function _hitWall(x, y) {
@@ -123,8 +136,8 @@
     return _hitTest.call(this, x1, y1, x2, y2);
   }
 
-  proto.hitBullet = function(x, y) {
-    return _hitBullet.call(this, x, y);
+  proto.hitBullet = function(x, y, direction) {
+    return _hitBullet.call(this, x, y, direction);
   }
 
   Util.augment(Map, proto);

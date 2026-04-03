@@ -239,14 +239,20 @@
       enemy.update = function() {
         this.run();
         this.forward();
-      }
+      };
+
+      var app = this;
+      enemy.destroy = function() {
+        this.destroyed = true;
+        if (app.board && app.board.enemyNum > 0) app.board.enemyNum--;
+      };
 
       this.screen.add(enemy);
     }
   }
 
   function _initBoard() {
-    this.screen.add(new Board({
+    this.board = new Board({
       scale: this.screen.scale,
       graphics: this.graphics,
       screen: this.screen,
@@ -254,7 +260,8 @@
       enemyNum: this.enemy,
       offsetX: this.screen.offsetX + this.cellWidth * 26 * this.screen.scale + 15 * this.screen.scale,
       offsetY: this.screen.offsetY + 15 * this.screen.scale
-    }));
+    });
+    this.screen.add(this.board);
   }
 
   function _mapRenderLayerBottom() {

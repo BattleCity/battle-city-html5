@@ -5,7 +5,8 @@
   function Player(options) {
     var opt = {
       level: 0,
-      fire: false
+      fire: false,
+      type: 'player'
     };
     Util.merge(opt, options);
     Util.merge(this, opt);
@@ -18,7 +19,7 @@
     var that = this;
     this.sounds['move'].sound.play();
 
-    if (this.directtion !== direct) {
+    if (this.direction !== direct) {
       this.direction = direct;
     }
 

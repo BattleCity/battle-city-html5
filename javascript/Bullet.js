@@ -27,21 +27,34 @@
         currentY -= 1;
         break;
       case 'down':
-        currentY += 1;
+        currentY += this.height;
         break;
       case 'left':
         currentX -= 1;
         break;
       case 'right':
-        currentX += 1;
+        currentX += this.width;
         break;
     }
     var x = parseInt(currentX / this.cellWidth);
     var y = parseInt(currentY / this.cellWidth);
-    return this.map.hitBullet(x, y);
+    return this.map.hitBullet(x, y, this.direction);
   }
 
   function _enemyTest() {
+    var that = this;
+    var list = this.screen._displayList;
+    for (var i = 0; i < list.length; i++) {
+      var target = list[i];
+      if (target.destroyed || !target.visible) continue;
+      var isTarget = (that.from === 'player' && target.type === 'enemy') ||
+                     (that.from === 'enemy' && target.type === 'player');
+      if (!isTarget) continue;
+      if (target.hitTest(that)) {
+        target.destroy();
+        return 'enemy';
+      }
+    }
     return false;
   }
 
