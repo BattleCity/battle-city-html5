@@ -27,13 +27,28 @@
       || pright === STEEL;
   }
 
-  function _hitBullet(x, y, direction) {
-    var x0 = Math.floor(x / 2) * 2;
-    var y0 = Math.floor(y / 2) * 2;
-    var cells = [
-      [x0, y0], [x0 + 1, y0],
-      [x0, y0 + 1], [x0 + 1, y0 + 1]
-    ];
+  function _hitBullet(x1, y1, x2, y2, direction) {
+    var x0 = Math.floor(x1 / 2) * 2;
+    var y0 = Math.floor(y1 / 2) * 2;
+    var cells = [];
+
+    if (direction === 'up' || direction === 'down') {
+      // 判断子弹横向覆盖了砖块对的哪几列
+      var cols = [];
+      if (x1 === x0) cols.push(x0);         // 子弹左边缘在左列
+      if (x2 >= x0 + 1) cols.push(x0 + 1); // 子弹右边缘到达右列
+      for (var i = 0; i < cols.length; i++) {
+        cells.push([cols[i], y0], [cols[i], y0 + 1]);
+      }
+    } else {
+      // 判断子弹纵向覆盖了砖块对的哪几行
+      var rows = [];
+      if (y1 === y0) rows.push(y0);         // 子弹上边缘在上行
+      if (y2 >= y0 + 1) rows.push(y0 + 1); // 子弹下边缘到达下行
+      for (var i = 0; i < rows.length; i++) {
+        cells.push([x0, rows[i]], [x0 + 1, rows[i]]);
+      }
+    }
 
     var result = null;
     for (var i = 0; i < cells.length; i++) {
@@ -136,8 +151,8 @@
     return _hitTest.call(this, x1, y1, x2, y2);
   }
 
-  proto.hitBullet = function(x, y, direction) {
-    return _hitBullet.call(this, x, y, direction);
+  proto.hitBullet = function(x1, y1, x2, y2, direction) {
+    return _hitBullet.call(this, x1, y1, x2, y2, direction);
   }
 
   Util.augment(Map, proto);

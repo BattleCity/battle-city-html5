@@ -22,23 +22,34 @@
   function _mapTest() {
     var currentX = this.offsetX - this.screen.offsetX;
     var currentY = this.offsetY - this.screen.offsetY;
+    var x1, y1, x2, y2;
     switch (this.direction) {
       case 'up':
         currentY -= 1;
+        x1 = parseInt(currentX / this.cellWidth);
+        x2 = parseInt((currentX + this.width - 1) / this.cellWidth);
+        y1 = y2 = parseInt(currentY / this.cellWidth);
         break;
       case 'down':
         currentY += this.height;
+        x1 = parseInt(currentX / this.cellWidth);
+        x2 = parseInt((currentX + this.width - 1) / this.cellWidth);
+        y1 = y2 = parseInt(currentY / this.cellWidth);
         break;
       case 'left':
         currentX -= 1;
+        y1 = parseInt(currentY / this.cellWidth);
+        y2 = parseInt((currentY + this.height - 1) / this.cellWidth);
+        x1 = x2 = parseInt(currentX / this.cellWidth);
         break;
       case 'right':
         currentX += this.width;
+        y1 = parseInt(currentY / this.cellWidth);
+        y2 = parseInt((currentY + this.height - 1) / this.cellWidth);
+        x1 = x2 = parseInt(currentX / this.cellWidth);
         break;
     }
-    var x = parseInt(currentX / this.cellWidth);
-    var y = parseInt(currentY / this.cellWidth);
-    return this.map.hitBullet(x, y, this.direction);
+    return this.map.hitBullet(x1, y1, x2, y2, this.direction);
   }
 
   function _enemyTest() {
