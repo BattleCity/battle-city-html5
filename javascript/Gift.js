@@ -1,8 +1,8 @@
 'use strict';
 
 (function(exports, undefined) {
-  function Gift() {
-    Sound.sup.call(this);
+  function Gift(options) {
+    Gift.sup.call(this, options);
   }
 
   var proto = {};

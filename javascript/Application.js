@@ -65,6 +65,7 @@
 
     Util.bind('keydown', function(e) {
       var status = that.get('status');
+      var keyCode = e.keyCode;
 
       if (status === 'start' || status === 'gameover' || status === 'stage-clear') return;
 
@@ -72,14 +73,21 @@
         that.splash.offsetY = offsetY;
         that.player.offsetY = offsetY + 170;
         that.set('status', 'select');
-        return;
+
+        if (keyCode === Keyboard.DOWN.keyCode) {
+          that.playerNum = 2;
+        } else if (keyCode === Keyboard.UP.keyCode) {
+          that.playerNum = 1;
+        } else {
+          return;
+        }
       }
 
-      if (e.keyCode === Keyboard.DOWN.keyCode) {
+      if (keyCode === Keyboard.DOWN.keyCode) {
         that.playerNum = 2;
-      } else if (e.keyCode === Keyboard.UP.keyCode) {
+      } else if (keyCode === Keyboard.UP.keyCode) {
         that.playerNum = 1;
-      } else if (e.keyCode === Keyboard.ENTER.keyCode) {
+      } else if (keyCode === Keyboard.ENTER.keyCode) {
         that.start();
       }
     });
@@ -88,6 +96,7 @@
   function _welcome() {
     logger.info('Welcome to tank.');
 
+    this.playerNum = 1;
     this.set('status', 'welcome');
     this.screen.clean();
 
@@ -212,7 +221,7 @@
         x: position.x,
         y: position.y
       },
-      speed: slot === 'player2' ? 2 : 1,
+      speed: 1,
       level: 0,
       cellWidth: this.cellWidth,
       screen: this.screen,

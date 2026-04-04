@@ -61,6 +61,7 @@
       case 'wall':
       case 'steel':
       case 'shield':
+      case 'bullet':
       default:
         return [
           {

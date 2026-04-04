@@ -31,34 +31,38 @@
   function _mapTest() {
     var currentX = this.offsetX - this.screen.offsetX;
     var currentY = this.offsetY - this.screen.offsetY;
+    var left = currentX;
+    var right = currentX + this.width - 1;
+    var top = currentY;
+    var bottom = currentY + this.height - 1;
     switch (this.direction) {
       case 'up':
-        currentY -= 1;
-        var xleft = parseInt(currentX / this.cellWidth);
-        var yleft = parseInt(currentY / this.cellWidth);
-        var xright = parseInt((currentX + this.width) / this.cellWidth);
-        var yright = parseInt(currentY / this.cellWidth);
+        top -= this.speed;
+        var xleft = parseInt(left / this.cellWidth);
+        var yleft = parseInt(top / this.cellWidth);
+        var xright = parseInt(right / this.cellWidth);
+        var yright = parseInt(top / this.cellWidth);
         break;
       case 'down':
-        currentY += 1;
-        var xleft = parseInt(currentX / this.cellWidth);
-        var yleft = parseInt((currentY + this.width) / this.cellWidth);
-        var xright = parseInt((currentX + this.width) / this.cellWidth);
-        var yright = parseInt((currentY + this.width) / this.cellWidth);
+        bottom += this.speed;
+        var xleft = parseInt(left / this.cellWidth);
+        var yleft = parseInt(bottom / this.cellWidth);
+        var xright = parseInt(right / this.cellWidth);
+        var yright = parseInt(bottom / this.cellWidth);
         break;
       case 'left':
-        currentX -= 1;
-        var xleft = parseInt(currentX / this.cellWidth);
-        var yleft = parseInt((currentY + this.width) / this.cellWidth);
-        var xright = parseInt(currentX / this.cellWidth);
-        var yright = parseInt(currentY / this.cellWidth);
+        left -= this.speed;
+        var xleft = parseInt(left / this.cellWidth);
+        var yleft = parseInt(bottom / this.cellWidth);
+        var xright = parseInt(left / this.cellWidth);
+        var yright = parseInt(top / this.cellWidth);
         break;
       case 'right':
-        currentX += 1;
-        var xleft = parseInt((currentX + this.width) / this.cellWidth);
-        var yleft = parseInt(currentY / this.cellWidth);
-        var xright = parseInt((currentX + this.width) / this.cellWidth);
-        var yright = parseInt((currentY + this.width) / this.cellWidth);
+        right += this.speed;
+        var xleft = parseInt(right / this.cellWidth);
+        var yleft = parseInt(top / this.cellWidth);
+        var xright = parseInt(right / this.cellWidth);
+        var yright = parseInt(bottom / this.cellWidth);
         break;
     }
     return this.map.hitTest(xleft, yleft, xright, yright);
@@ -188,17 +192,17 @@
         break;
       case 'down':
         var offsetX = this.offsetX + this.width / 2 - graphics.width / 8;
-        var offsetY = this.offsetY + this.width - graphics.height;
+        var offsetY = this.offsetY + this.height - graphics.height;
         var x = 2;
         break;
       case 'left':
         var offsetX = this.offsetX;
-        var offsetY = this.offsetY + this.width / 2 - graphics.width / 8;
+        var offsetY = this.offsetY + this.height / 2 - graphics.width / 8;
         var x = 3;
         break;
       case 'right':
         var offsetX = this.offsetX + this.width - graphics.width / 4;
-        var offsetY = this.offsetY + this.width / 2 - graphics.width / 8;
+        var offsetY = this.offsetY + this.height / 2 - graphics.width / 8;
         var x = 1;
         break;
     }

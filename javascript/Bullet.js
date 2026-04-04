@@ -75,17 +75,48 @@
     return false;
   }
 
+  function _bulletTest() {
+    var that = this;
+    var list = this.screen._displayList;
+    for (var i = 0; i < list.length; i++) {
+      var target = list[i];
+      if (target === that) continue;
+      if (target.destroyed || target.type !== 'bullet') continue;
+      if (target.from === that.from) continue;
+      if (!target.hitTest(that)) continue;
+
+      var width = Math.max(that.width, target.width);
+      var height = Math.max(that.height, target.height);
+      var centerX = (that.offsetX + that.width / 2 + target.offsetX + target.width / 2) / 2;
+      var centerY = (that.offsetY + that.height / 2 + target.offsetY + target.height / 2) / 2;
+      target.destroy();
+      return {
+        type: 'bullet',
+        target: {
+          offsetX: centerX - width / 2,
+          offsetY: centerY - height / 2,
+          width: width,
+          height: height
+        }
+      };
+    }
+    return false;
+  }
+
   function _hitTest() {
     var edgeTest = _edgeTest.call(this);
     if (edgeTest) return edgeTest;
     var mapTest = _mapTest.call(this);
     if (mapTest) return mapTest;
+    var bulletTest = _bulletTest.call(this);
+    if (bulletTest) return bulletTest;
     var enemyTest = _enemyTest.call(this);
     if (enemyTest) return enemyTest;
   }
 
   function Bullet(options) {
     var opt = {
+      type: 'bullet',
       speed: 1,
       direction: 'up',
       y: 0,
@@ -101,7 +132,10 @@
   var proto = {};
 
   proto.update = function() {
-    if (this.app && !this.app.isPlaying()) return;
+    if (this.app && !this.app.isPlaying()) {
+      this.destroy();
+      return;
+    }
 
     switch (this.direction) {
       case 'up':

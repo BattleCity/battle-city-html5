@@ -135,9 +135,16 @@
     }
 
     // 碰撞时换方向
-    if (this.test()) {
-      _fallback.call(this);
+    var blocked = this.test();
+    if (blocked) {
+      var attempts = 0;
+      while (blocked && attempts < 4) {
+        _fallback.call(this);
+        blocked = this.test();
+        attempts++;
+      }
       this._dirCounter = 0;
+      if (blocked) return;
     }
 
     // 定时开火（与换方向相互独立）
