@@ -10,6 +10,11 @@
       speed: 1,
       dead: false,
       life: 1,
+      invincible: false,
+      spawning: true,
+      bulletLimit: 1,
+      app: null,
+      onDestroy: null,
       position: {
         x: 0,
         y: 0
@@ -59,11 +64,41 @@
     return this.map.hitTest(xleft, yleft, xright, yright);
   }
 
+  function _tankTest() {
+    var list = this.screen._displayList;
+    var nextX = this.offsetX;
+    var nextY = this.offsetY;
+
+    switch (this.direction) {
+      case 'up':    nextY -= this.speed; break;
+      case 'down':  nextY += this.speed; break;
+      case 'left':  nextX -= this.speed; break;
+      case 'right': nextX += this.speed; break;
+    }
+
+    for (var i = 0; i < list.length; i++) {
+      var other = list[i];
+      if (other === this) continue;
+      if (other.destroyed || other.dead || other.spawning) continue;
+      if (other.type !== 'player' && other.type !== 'enemy') continue;
+
+      if (nextX < other.offsetX + other.width &&
+          nextX + this.width > other.offsetX &&
+          nextY < other.offsetY + other.height &&
+          nextY + this.height > other.offsetY) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   function _hitTest() {
     var edgeTest = _edgeTest.call(this);
     if (edgeTest) return edgeTest;
     var mapTest = _mapTest.call(this);
     if (mapTest) return mapTest;
+    var tankTest = _tankTest.call(this);
+    if (tankTest) return tankTest;
   }
 
   function _edgeTest() {
@@ -89,7 +124,33 @@
     this.offsetX += this.position.x * this.cellWidth;
     this.offsetY += this.position.y * this.cellWidth;
     this.speed *= this.scale;
+    this._activeBullets = 0;
     this.born();
+  }
+
+  proto.canAct = function() {
+    return !this.spawning &&
+      !this.destroyed &&
+      !this.dead &&
+      (!this.app || this.app.isPlaying());
+  }
+
+  proto.syncEffects = function() {
+    if (this._bornAnim && !this._bornAnim.destroyed) {
+      this._bornAnim.offsetX = this.offsetX;
+      this._bornAnim.offsetY = this.offsetY;
+    }
+
+    if (this._shieldAnim && !this._shieldAnim.destroyed) {
+      this._shieldAnim.offsetX = this.offsetX;
+      this._shieldAnim.offsetY = this.offsetY;
+    }
+  }
+
+  proto.move = function(offsetX, offsetY) {
+    this.offsetX += offsetX || 0;
+    this.offsetY += offsetY || 0;
+    this.syncEffects();
   }
 
   proto.run = function() {
@@ -114,6 +175,9 @@
   }
 
   proto.shot = function() {
+    if (!this.canAct()) return;
+    if (this._activeBullets >= this.bulletLimit) return;
+
     this.sounds['fire'].sound.play();
     var graphics = this.graphics['bullet'];
     switch (this.direction) {
@@ -139,6 +203,7 @@
         break;
     }
 
+    this._activeBullets++;
     this.screen.add(new Bullet({
       image: graphics.image,
       map: this.map,
@@ -152,10 +217,12 @@
       direction: this.direction,
       speed: 3,
       screen: this.screen,
+      app: this.app,
       cellWidth: this.cellWidth,
       sounds: this.sounds,
       graphics: this.graphics,
       from: this.type,
+      owner: this,
       debug: false
     }));
   }
@@ -170,11 +237,15 @@
       image: born.image,
       height: born.height,
       width: born.width / 4,
+      scale: this.scale,
       x: 0,
       y: 0
     });
+    this._bornAnim = bornAnim;
 
     bornAnim.update = function() {
+      this.offsetX = that.offsetX;
+      this.offsetY = that.offsetY;
       counter ++;
       if (counter % 10 === 0) {
         this.x ++;
@@ -182,6 +253,8 @@
       }
 
       if (counter === 120) {
+        that.spawning = false;
+        that._bornAnim = null;
         this.destroy();
         setTimeout(function() {
           that.shield();
@@ -195,6 +268,7 @@
     var that = this;
     var shield = this.graphics['shield'];
     var counter = 0;
+    that.invincible = true;
     that.visible = true;
     var shieldAnim = new Sprite({
       offsetX: this.offsetX,
@@ -202,17 +276,23 @@
       image: shield.image,
       height: shield.height / 2,
       width: shield.width,
+      scale: this.scale,
       x: 0,
       y: 0
     });
+    this._shieldAnim = shieldAnim;
 
     shieldAnim.update = function() {
+      this.offsetX = that.offsetX;
+      this.offsetY = that.offsetY;
       counter ++;
       if (counter % 10 === 0) {
         this.y = this.y === 0 ? 1 : 0;
       }
 
       if (counter === 80) {
+        that.invincible = false;
+        that._shieldAnim = null;
         this.destroy();
       }
     }
@@ -224,8 +304,42 @@
     return _hitTest.call(this);
   }
 
+  proto.hit = function() {
+    return !this.invincible;
+  }
+
+  proto.explode = function() {
+    if (!this.screen || !this.graphics || !this.sounds) return;
+    this.screen.add(new Explostion({
+      offsetX: this.offsetX + this.width / 2,
+      offsetY: this.offsetY + this.height / 2,
+      baseWidth: this.width,
+      baseHeight: this.height,
+      sounds: this.sounds,
+      graphics: this.graphics,
+      screen: this.screen,
+      scale: this.scale,
+      type: 'tank'
+    }));
+  }
+
+  proto.destroy = function() {
+    if (this.destroyed) return;
+    this.explode();
+    this.destroyed = true;
+    this.dead = true;
+    this.visible = false;
+    this.invincible = false;
+    if (this._bornAnim && !this._bornAnim.destroyed) this._bornAnim.destroy();
+    if (this._shieldAnim && !this._shieldAnim.destroyed) this._shieldAnim.destroy();
+    this._bornAnim = null;
+    this._shieldAnim = null;
+    if (typeof this.onDestroy === 'function') {
+      this.onDestroy(this);
+    }
+  }
+
   Util.augment(Tank, proto);
   Util.inherit(Tank, Sprite);
   exports.Tank = Tank;
 })(this);
-

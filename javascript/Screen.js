@@ -10,6 +10,8 @@
     this.offsetX = this.width / 25;
     this.offsetY = this.height / 12.5;
     this._displayList = [];
+    this._pendingAddList = [];
+    this._isUpdating = false;
     this.init();
   }
 
@@ -29,21 +31,32 @@
   proto.update = function() {
     var that = this;
     var tempArr = [];
+    this._isUpdating = true;
     this.clear();
     Util.each(this._displayList, function(i) {
       if (i.destroyed) return;
       tempArr.push(i);
       i.draw && i.draw(that);
     });
+    this._isUpdating = false;
+    if (this._pendingAddList.length) {
+      tempArr = tempArr.concat(this._pendingAddList);
+      this._pendingAddList = [];
+    }
     this._displayList = tempArr;
   }
 
   proto.add = function(item) {
+    if (this._isUpdating) {
+      this._pendingAddList.push(item);
+      return;
+    }
     this._displayList.push(item);
   }
 
   proto.clean = function() {
     this._displayList = [];
+    this._pendingAddList = [];
   }
 
   Util.augment(Screen, proto);

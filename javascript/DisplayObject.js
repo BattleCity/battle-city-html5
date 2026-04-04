@@ -57,7 +57,7 @@
   }
 
   proto.debugRect = function(screen) {
-    if (!this.debug) return;
+    if (!DEBUG_HITBOX || !this.debug) return;
     screen.ctx.save();
     screen.ctx.lineWidth = 1;
     screen.ctx.strokeStyle = "#fff";

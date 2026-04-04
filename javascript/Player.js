@@ -16,7 +16,7 @@
   var proto = {};
 
   proto.forward = function(direct) {
-    var that = this;
+    if (!this.canAct()) return;
     this.sounds['move'].sound.play();
 
     if (this.direction !== direct) {
@@ -27,16 +27,16 @@
 
     switch (this.direction) {
       case 'up':
-        this.offsetY -= this.speed;
+        this.move(0, -this.speed);
         break;
       case 'down':
-        this.offsetY += this.speed;
+        this.move(0, this.speed);
         break;
       case 'left':
-        this.offsetX -= this.speed;
+        this.move(-this.speed, 0);
         break;
       case 'right':
-        this.offsetX += this.speed;
+        this.move(this.speed, 0);
         break;
     }
   }
