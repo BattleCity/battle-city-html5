@@ -17,4 +17,5 @@
   exports.OFFSETX = 0;
   exports.OFFSETY = 0;
   exports.DEBUG = true;
+  exports.DEBUG_HITBOX = false;
 })(this);

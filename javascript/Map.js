@@ -15,6 +15,21 @@
   var HOME2 = 7;
   var HOME3 = 8;
   var HOME4 = 9;
+  var HOME_BROKEN1 = 10;
+  var HOME_BROKEN2 = 11;
+  var HOME_BROKEN3 = 12;
+  var HOME_BROKEN4 = 13;
+
+  function _isHome(code) {
+    return code === HOME1
+      || code === HOME2
+      || code === HOME3
+      || code === HOME4
+      || code === HOME_BROKEN1
+      || code === HOME_BROKEN2
+      || code === HOME_BROKEN3
+      || code === HOME_BROKEN4;
+  }
 
   function _hitTest(xleft, yleft, xright, yright) {
     if (!this.map[yleft] || !this.map[yright]) return true;
@@ -58,6 +73,9 @@
       if (p === WALL) {
         _hitWall.call(this, cx, cy);
         result = 'wall';
+      } else if (_isHome(p)) {
+        _destroyHome.call(this);
+        result = 'home';
       } else if (p === STEEL && !result) {
         result = 'steel';
       }
@@ -67,6 +85,14 @@
 
   function _hitWall(x, y) {
     this.map[y][x] = NONE;
+  }
+
+  function _destroyHome() {
+    this.map[24][12] = HOME_BROKEN1;
+    this.map[24][13] = HOME_BROKEN2;
+    this.map[25][12] = HOME_BROKEN3;
+    this.map[25][13] = HOME_BROKEN4;
+    this.homeDestroyed = true;
   }
 
   function _drawBackground(screen) {
@@ -137,6 +163,22 @@
               break;
             case HOME4:
               posX = 5.5;
+              posY = 0.5;
+              break;
+            case HOME_BROKEN1:
+              posX = 6;
+              posY = 0;
+              break;
+            case HOME_BROKEN2:
+              posX = 6.5;
+              posY = 0;
+              break;
+            case HOME_BROKEN3:
+              posX = 6;
+              posY = 0.5;
+              break;
+            case HOME_BROKEN4:
+              posX = 6.5;
               posY = 0.5;
               break;
           }

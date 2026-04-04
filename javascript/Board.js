@@ -12,16 +12,24 @@
 
   var proto = {};
 
-  proto.showNumber = function(screen, num) {
+  proto.showNumber = function(screen, num, offsetX, offsetY) {
     var image = this.graphics.num.image;
     var originWidth = this.graphics.num.width / 10;
     var originHeight = this.graphics.num.height;
     var width = originWidth * this.scale;
     var height = originHeight * this.scale;
     screen.ctx.save();
-    screen.ctx.translate(this.offsetX, this.offsetY);
+    screen.ctx.translate(offsetX, offsetY);
     screen.ctx.drawImage(image, num * originWidth, 0, originWidth, originHeight, 0, 0, width, height);
     screen.ctx.restore();
+  }
+
+  proto.showValue = function(screen, value, offsetX, offsetY) {
+    var str = String(Math.max(0, value));
+    var digitWidth = this.graphics.num.width / 10 * this.scale;
+    for (var i = 0; i < str.length; i++) {
+      this.showNumber(screen, parseInt(str.charAt(i), 10), offsetX + i * digitWidth, offsetY);
+    }
   }
 
   proto.enemyInfo = function(screen) {
@@ -56,6 +64,7 @@
     screen.ctx.translate(that.offsetX, that.offsetY + 200);
     screen.ctx.drawImage(image, cellWidth, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
     screen.ctx.restore();
+    this.showValue(screen, this.player1Lives, that.offsetX + 20 * this.scale, that.offsetY + 200);
 
     if (this.playerNum === 2) {
       screen.ctx.save();
@@ -66,8 +75,8 @@
       screen.ctx.translate(that.offsetX, that.offsetY + 260);
       screen.ctx.drawImage(image, cellWidth, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
       screen.ctx.restore();
+      this.showValue(screen, this.player2Lives, that.offsetX + 20 * this.scale, that.offsetY + 260);
     }
-    //this.showNumber(ctx, 1);
   }
 
   proto.stageInfo = function(screen) {
@@ -78,7 +87,7 @@
     screen.ctx.translate(that.offsetX, that.offsetY + 300);
     screen.ctx.drawImage(image, 0, 0, cellWidth, cellWidth, 0, 0, cellWidth * this.scale, cellWidth * this.scale);
     screen.ctx.restore();
-    //this.showNumber(ctx, 2);
+    this.showValue(screen, this.stage + 1, that.offsetX + 6 * this.scale, that.offsetY + 340);
   }
 
   proto.draw = function(screen) {

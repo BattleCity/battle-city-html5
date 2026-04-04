@@ -57,13 +57,19 @@
     var list = this.screen._displayList;
     for (var i = 0; i < list.length; i++) {
       var target = list[i];
-      if (target.destroyed || !target.visible) continue;
+      if (target.destroyed || target.dead || target.spawning) continue;
       var isTarget = (that.from === 'player' && target.type === 'enemy') ||
                      (that.from === 'enemy' && target.type === 'player');
       if (!isTarget) continue;
       if (target.hitTest(that)) {
-        target.destroy();
-        return 'enemy';
+        var isDead = typeof target.hit === 'function' ? target.hit() : true;
+        if (isDead) {
+          target.destroy();
+        }
+        return {
+          type: isDead ? null : 'shield',
+          target: target
+        };
       }
     }
     return false;
@@ -83,7 +89,9 @@
       speed: 1,
       direction: 'up',
       y: 0,
-      x: 0
+      x: 0,
+      owner: null,
+      app: null
     };
     Util.merge(opt, options);
     Util.merge(this, opt);
@@ -93,6 +101,8 @@
   var proto = {};
 
   proto.update = function() {
+    if (this.app && !this.app.isPlaying()) return;
+
     switch (this.direction) {
       case 'up':
         this.offsetY -= this.speed;
@@ -111,18 +121,48 @@
     var hitTest = this.test();
     if (hitTest) {
       this.destroy();
-      new Explostion({
-        offsetX: this.offsetX,
-        offsetY: this.offsetY,
-        sounds: this.sounds,
-        graphics: this.graphics,
-        type: hitTest
-      })
+      var type = typeof hitTest === 'string' ? hitTest : hitTest.type;
+      var target = hitTest.target;
+      var offsetX = target ? target.offsetX + target.width / 2 : this.offsetX + this.width / 2;
+      var offsetY = target ? target.offsetY + target.height / 2 : this.offsetY + this.height / 2;
+      var baseWidth = target ? target.width : this.cellWidth;
+      var baseHeight = target ? target.height : this.cellWidth;
+
+      if (type === 'home') {
+        baseWidth = this.cellWidth * 2;
+        baseHeight = this.cellWidth * 2;
+      }
+
+      if (type === 'home' && this.app && this.app.homeDestroyed) {
+        this.app.homeDestroyed();
+      }
+
+      if (type) {
+        this.screen.add(new Explostion({
+          offsetX: offsetX,
+          offsetY: offsetY,
+          baseWidth: baseWidth,
+          baseHeight: baseHeight,
+          sounds: this.sounds,
+          graphics: this.graphics,
+          screen: this.screen,
+          scale: this.scale,
+          type: type
+        }));
+      }
     }
   }
 
   proto.test = function() {
     return _hitTest.call(this);
+  }
+
+  proto.destroy = function() {
+    if (this.destroyed) return;
+    this.destroyed = true;
+    if (this.owner && this.owner._activeBullets > 0) {
+      this.owner._activeBullets--;
+    }
   }
 
   Util.augment(Bullet, proto);
