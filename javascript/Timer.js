@@ -37,14 +37,13 @@
   }
 
   proto.pause = function() {
-    this.pause = true;
+    this.paused = true;
   }
 
   proto.go = function() {
-    this.pause = false;
+    this.paused = false;
   }
 
   Util.augment(Timer, proto);
   exports.Timer = Timer;
 })(this);
-

@@ -183,7 +183,9 @@
               break;
           }
         }
-        screen.ctx.drawImage(that.image, posX * 2 * that.cellWidth, posY * 2 * that.cellWidth, that.cellWidth, that.cellWidth, 0, 0, width, height);
+        if (posX >= 0 && posY >= 0) {
+          screen.ctx.drawImage(that.image, posX * 2 * that.cellWidth, posY * 2 * that.cellWidth, that.cellWidth, that.cellWidth, 0, 0, width, height);
+        }
         screen.ctx.restore();
       })
     })

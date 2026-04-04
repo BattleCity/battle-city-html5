@@ -5,32 +5,88 @@
   function loader(item) {
     var that = this;
     var sound = document.createElement('audio');
-    var _play = sound.play;
+    var nativePlay = sound.play;
+    var allowOverlap = item.id !== 'move' && item.id !== 'enemy';
+    var maxChannels = 6;
+    var settled = false;
+
+    function settle(callback) {
+      if (settled) return;
+      settled = true;
+      callback();
+    }
 
     sound.play = function() {
-      if (this._playing) return;
-      this.load();
-      _play.call(this);
-      this._playing = true;
+      var channel = this;
+
+      if (allowOverlap) {
+        if (!this._channels) {
+          this._channels = [this];
+        }
+
+        for (var i = 0; i < this._channels.length; i++) {
+          if (this._channels[i].paused || this._channels[i].ended) {
+            channel = this._channels[i];
+            break;
+          }
+        }
+
+        if (channel === this && !this.paused && !this.ended) {
+          if (this._channels.length >= maxChannels) {
+            channel = this._channels[0];
+          } else {
+            channel = this.cloneNode();
+            channel.preload = 'auto';
+            channel.src = this.src;
+            this._channels.push(channel);
+            document.body.appendChild(channel);
+          }
+        }
+      } else if (!this.paused && !this.ended) {
+        return;
+      }
+
+      try {
+        channel.currentTime = 0;
+      } catch (e) {}
+
+      nativePlay.call(channel);
     }
     sound.preload = 'auto';
+    sound._channels = [sound];
 
     sound.oncanplay = function() {
-      that.num ++;
-      that.sounds[item.id] = {
-        index: that.num,
-        sound: sound,
-        src: item.src
-      };
+      settle(function() {
+        that.num ++;
+        that.sounds[item.id] = {
+          index: that.num,
+          sound: sound,
+          src: item.src
+        };
 
-      if (that.num === that.size()) {
-        that.emit('complete', that.sounds);
-      } else {
-        that.emit('success', that.sounds[item.id]);
-      }
+        if (that.num === that.size()) {
+          that.emit('complete', that.sounds);
+        } else {
+          that.emit('success', that.sounds[item.id]);
+        }
+      });
     }
-    sound.onended = function() {
-      this._playing = false;
+    sound.onerror = function() {
+      settle(function() {
+        that.num ++;
+        that.sounds[item.id] = {
+          index: that.num,
+          sound: sound,
+          src: item.src,
+          failed: true
+        };
+
+        if (that.num === that.size()) {
+          that.emit('complete', that.sounds);
+        } else {
+          that.emit('error', that.sounds[item.id]);
+        }
+      });
     }
     sound.src = item.src;
     document.body.appendChild(sound);
@@ -61,4 +117,3 @@
   Util.inherit(Sound, Base);
   exports.Sound = Sound;
 })(this);
-

@@ -35,7 +35,7 @@
     var minx = this.offsetX > obj.offsetX ? this.offsetX : obj.offsetX;
     var maxx = this.offsetX + this.width < obj.offsetX + obj.width ? this.offsetX + this.width : obj.offsetX + obj.width;
     var miny = this.offsetY > obj.offsetY ? this.offsetY : obj.offsetY;
-    var maxy = this.offsetY + this.width < obj.offsetY + obj.width ? this.offsetY + this.width : obj.offsetY + obj.width;
+    var maxy = this.offsetY + this.height < obj.offsetY + obj.height ? this.offsetY + this.height : obj.offsetY + obj.height;
     return minx <= maxx && miny <= maxy;
   }
 
