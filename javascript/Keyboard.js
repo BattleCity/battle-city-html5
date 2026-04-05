@@ -118,7 +118,6 @@
 
   proto = {
     simulate: function() {
-      if (keysDown.length === 0) return;  // Skip when no keys pressed (#31)
       var i, len = keysDown.length;
       for (i = 0; i < len; i++) {
         var keyCode = keysDown[i];

@@ -12,9 +12,6 @@
     this._displayList = [];
     this._pendingAddList = [];
     this._isUpdating = false;
-    // Typed object lists for fast collision lookups (#10)
-    this._tanks = [];   // players + enemies
-    this._bullets = [];
     this.init();
   }
 
@@ -32,70 +29,34 @@
   }
 
   proto.update = function() {
-    var list = this._displayList;
+    var that = this;
+    var tempArr = [];
     this._isUpdating = true;
     this.clear();
-
-    // In-place compaction: draw live objects and remove destroyed ones (#6)
-    var writeIdx = 0;
-    for (var i = 0, len = list.length; i < len; i++) {
-      var item = list[i];
-      if (item.destroyed) continue;
-      list[writeIdx++] = item;
-      if (item.draw) item.draw(this);
-    }
-    list.length = writeIdx;
-
+    Util.each(this._displayList, function(i) {
+      if (i.destroyed) return;
+      tempArr.push(i);
+      i.draw && i.draw(that);
+    });
     this._isUpdating = false;
-
-    // Append any objects added during this frame
     if (this._pendingAddList.length) {
-      for (var j = 0, pLen = this._pendingAddList.length; j < pLen; j++) {
-        list.push(this._pendingAddList[j]);
-      }
-      this._pendingAddList.length = 0;
+      tempArr = tempArr.concat(this._pendingAddList);
+      this._pendingAddList = [];
     }
-
-    // Periodically clean typed lists
-    this._cleanTypedLists();
+    this._displayList = tempArr;
   }
 
   proto.add = function(item) {
     if (this._isUpdating) {
       this._pendingAddList.push(item);
-    } else {
-      this._displayList.push(item);
+      return;
     }
-    // Register in typed lists (#10)
-    if (item.type === 'player' || item.type === 'enemy') {
-      this._tanks.push(item);
-    } else if (item.type === 'bullet') {
-      this._bullets.push(item);
-    }
+    this._displayList.push(item);
   }
 
   proto.clean = function() {
     this._displayList = [];
     this._pendingAddList = [];
-    this._tanks = [];
-    this._bullets = [];
-  }
-
-  // Periodic cleanup of typed lists (called during update)
-  proto._cleanTypedLists = function() {
-    var i, w;
-    // Clean tanks
-    w = 0;
-    for (i = 0; i < this._tanks.length; i++) {
-      if (!this._tanks[i].destroyed) this._tanks[w++] = this._tanks[i];
-    }
-    this._tanks.length = w;
-    // Clean bullets
-    w = 0;
-    for (i = 0; i < this._bullets.length; i++) {
-      if (!this._bullets[i].destroyed) this._bullets[w++] = this._bullets[i];
-    }
-    this._bullets.length = w;
   }
 
   Util.augment(Screen, proto);

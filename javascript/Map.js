@@ -20,28 +20,6 @@
   var HOME_BROKEN3 = 12;
   var HOME_BROKEN4 = 13;
 
-  // Lookup table: tile code → [posX, posY] for layer 0
-  // Replaces the per-tile switch statement (#5)
-  var TILE_POS_LAYER0 = [];
-  TILE_POS_LAYER0[NONE] = null;
-  TILE_POS_LAYER0[WALL] = [0, 0];
-  TILE_POS_LAYER0[STEEL] = [1, 0];
-  TILE_POS_LAYER0[GRASS] = null;  // grass only on layer 1
-  TILE_POS_LAYER0[WATER] = [4, 0];
-  TILE_POS_LAYER0[ICE] = [3, 0];
-  TILE_POS_LAYER0[HOME1] = [5, 0];
-  TILE_POS_LAYER0[HOME2] = [5.5, 0];
-  TILE_POS_LAYER0[HOME3] = [5, 0.5];
-  TILE_POS_LAYER0[HOME4] = [5.5, 0.5];
-  TILE_POS_LAYER0[HOME_BROKEN1] = [6, 0];
-  TILE_POS_LAYER0[HOME_BROKEN2] = [6.5, 0];
-  TILE_POS_LAYER0[HOME_BROKEN3] = [6, 0.5];
-  TILE_POS_LAYER0[HOME_BROKEN4] = [6.5, 0.5];
-
-  // Layer 1 only draws grass
-  var TILE_POS_LAYER1 = [];
-  TILE_POS_LAYER1[GRASS] = [2, 0];
-
   function _isHome(code) {
     return code === HOME1
       || code === HOME2
@@ -88,26 +66,19 @@
     }
 
     var result = null;
-    var mapDirty = false;
     for (var i = 0; i < cells.length; i++) {
       var cx = cells[i][0], cy = cells[i][1];
       if (!this.map[cy] || this.map[cy][cx] === undefined) continue;
       var p = this.map[cy][cx];
       if (p === WALL) {
         _hitWall.call(this, cx, cy);
-        mapDirty = true;
         result = 'wall';
       } else if (_isHome(p)) {
         _destroyHome.call(this);
-        mapDirty = true;
         result = 'home';
       } else if (p === STEEL && !result) {
         result = 'steel';
       }
-    }
-    // Invalidate offscreen cache when map data changes
-    if (mapDirty) {
-      this._cacheDirty = true;
     }
     return result;
   }
@@ -131,62 +102,93 @@
     screen.ctx.fillRect(this.offsetX, this.offsetY, this.cellWidth * 26 * this.scale, this.cellWidth * 26 * this.scale);
   }
 
-  // Render the map tiles to an offscreen canvas for caching (#1)
-  function _renderToCache() {
-    var lookup = this.layer === 1 ? TILE_POS_LAYER1 : TILE_POS_LAYER0;
-    var tileSize = this.cellWidth * this.scale;
-    var mapPixelSize = tileSize * 26;
-
-    if (!this._cacheCanvas) {
-      this._cacheCanvas = document.createElement('canvas');
-    }
-    this._cacheCanvas.width = mapPixelSize;
-    this._cacheCanvas.height = mapPixelSize;
-    var cacheCtx = this._cacheCanvas.getContext('2d');
-
-    var map = this.map;
-    var cellWidth = this.cellWidth;
-    var image = this.image;
-
-    for (var y = 0; y < map.length; y++) {
-      var row = map[y];
-      for (var x = 0; x < row.length; x++) {
-        var pos = lookup[row[x]];
-        if (pos) {
-          cacheCtx.drawImage(
-            image,
-            pos[0] * 2 * cellWidth, pos[1] * 2 * cellWidth,
-            cellWidth, cellWidth,
-            tileSize * x, tileSize * y,
-            tileSize, tileSize
-          );
-        }
-      }
-    }
-
-    this._cacheDirty = false;
-  }
-
   function Map(options) {
     var opt = {};
     Util.merge(opt, options);
     Util.merge(this, opt);
-    this._cacheCanvas = null;
-    this._cacheDirty = true;
   }
 
   var proto = {};
 
   proto.draw = function(screen) {
-    if (this.layer === 0) _drawBackground.call(this, screen);
+    var that = this;
 
-    // Rebuild offscreen cache if dirty (initial or after bullet hit)
-    if (this._cacheDirty || !this._cacheCanvas) {
-      _renderToCache.call(this);
-    }
+    if(this.layer === 0) _drawBackground.call(this, screen);
 
-    // Single drawImage from cached offscreen canvas
-    screen.ctx.drawImage(this._cacheCanvas, this.offsetX, this.offsetY);
+    Util.each(this.map, function(i, y) {
+      Util.each(i, function(j, x) {
+        var width = that.cellWidth * that.scale;
+        var height = that.cellWidth * that.scale;
+        screen.ctx.save();
+        screen.ctx.translate(width * x + that.offsetX, height * y + that.offsetY);
+        var posX = -1;
+        var posY = -1;
+
+        if (that.layer === 1) {
+          if (j === GRASS) {
+            posX = 2;
+            posY = 0;
+          }
+        } else if(that.layer === 0) {
+          switch (j) {
+            case NONE:
+              break;
+            case WALL:
+              posX = 0;
+              posY = 0;
+              break;
+            case STEEL:
+              posX = 1;
+              posY = 0;
+              break;
+            case ICE:
+              posX = 3;
+              posY = 0;
+              break;
+            case WATER:
+              posX = 4;
+              posY = 0;
+              break;
+            case HOME1:
+              posX = 5;
+              posY = 0;
+              break;
+            case HOME2:
+              posX = 5.5;
+              posY = 0;
+              break;
+            case HOME3:
+              posX = 5;
+              posY = 0.5;
+              break;
+            case HOME4:
+              posX = 5.5;
+              posY = 0.5;
+              break;
+            case HOME_BROKEN1:
+              posX = 6;
+              posY = 0;
+              break;
+            case HOME_BROKEN2:
+              posX = 6.5;
+              posY = 0;
+              break;
+            case HOME_BROKEN3:
+              posX = 6;
+              posY = 0.5;
+              break;
+            case HOME_BROKEN4:
+              posX = 6.5;
+              posY = 0.5;
+              break;
+          }
+        }
+        if (posX >= 0 && posY >= 0) {
+          screen.ctx.drawImage(that.image, posX * 2 * that.cellWidth, posY * 2 * that.cellWidth, that.cellWidth, that.cellWidth, 0, 0, width, height);
+        }
+        screen.ctx.restore();
+      })
+    })
   }
 
   proto.hitTest = function(x1, y1, x2, y2) {
@@ -195,11 +197,6 @@
 
   proto.hitBullet = function(x1, y1, x2, y2, direction) {
     return _hitBullet.call(this, x1, y1, x2, y2, direction);
-  }
-
-  // Mark cache as dirty externally (e.g. gift effect)
-  proto.invalidateCache = function() {
-    this._cacheDirty = true;
   }
 
   Util.augment(Map, proto);

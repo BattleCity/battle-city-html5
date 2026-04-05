@@ -73,21 +73,13 @@
     this._fallbackDirs = others;
   }
 
-  // Pre-computed direction fallback sets to avoid array allocation (#8)
-  var DIRECTION_FALLBACKS = {
-    'up': ['down', 'left', 'right'],
-    'down': ['up', 'left', 'right'],
-    'left': ['up', 'down', 'right'],
-    'right': ['up', 'down', 'left']
-  };
-
   // 碰撞时从备用列表选下一个方向
   function _fallback() {
     if (this._fallbackDirs && this._fallbackDirs.length > 0) {
       this.direction = this._fallbackDirs.shift();
     } else {
-      var others = DIRECTION_FALLBACKS[this.direction];
-      this.direction = others[Math.floor(Math.random() * others.length)];
+      var all = ['up', 'down', 'left', 'right'].filter(function(d) { return d !== this.direction; }, this);
+      this.direction = all[Math.floor(Math.random() * all.length)];
     }
   }
 

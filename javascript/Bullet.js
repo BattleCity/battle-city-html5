@@ -54,7 +54,7 @@
 
   function _enemyTest() {
     var that = this;
-    var list = this.screen._tanks;  // Use typed list (#10)
+    var list = this.screen._displayList;
     for (var i = 0; i < list.length; i++) {
       var target = list[i];
       if (target.destroyed || target.dead || target.spawning) continue;
@@ -77,11 +77,11 @@
 
   function _bulletTest() {
     var that = this;
-    var list = this.screen._bullets;  // Use typed list (#10)
+    var list = this.screen._displayList;
     for (var i = 0; i < list.length; i++) {
       var target = list[i];
       if (target === that) continue;
-      if (target.destroyed) continue;
+      if (target.destroyed || target.type !== 'bullet') continue;
       if (target.from === that.from) continue;
       if (!target.hitTest(that)) continue;
 
