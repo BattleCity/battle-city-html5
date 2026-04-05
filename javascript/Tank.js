@@ -69,7 +69,7 @@
   }
 
   function _tankTest() {
-    var list = this.screen._displayList;
+    var list = this.screen._tanks;  // Use typed list instead of full displayList (#10)
     var nextX = this.offsetX;
     var nextY = this.offsetY;
 
@@ -84,7 +84,6 @@
       var other = list[i];
       if (other === this) continue;
       if (other.destroyed || other.dead || other.spawning) continue;
-      if (other.type !== 'player' && other.type !== 'enemy') continue;
 
       if (nextX < other.offsetX + other.width &&
           nextX + this.width > other.offsetX &&

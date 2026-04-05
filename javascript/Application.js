@@ -155,8 +155,13 @@
   }
 
   function _syncEnemyTargets() {
-    var players = [this.player1, this.player2].filter(_isActivePlayer);
-    var list = this.screen._displayList;
+    // Cache active player list to avoid allocation on every call (#28)
+    var players = [];
+    if (_isActivePlayer(this.player1)) players.push(this.player1);
+    if (_isActivePlayer(this.player2)) players.push(this.player2);
+    this._cachedPlayers = players;
+
+    var list = this.screen._tanks;  // Use typed list (#10)
     for (var i = 0; i < list.length; i++) {
       if (list[i].type === 'enemy' && !list[i].destroyed) {
         list[i].players = players;
@@ -360,7 +365,7 @@
 
   function _countLiveEnemies(app) {
     var count = 0;
-    var list = app.screen._displayList;
+    var list = app.screen._tanks;  // Use typed list (#10)
     for (var i = 0; i < list.length; i++) {
       if (!list[i].destroyed && list[i].type === 'enemy') count++;
     }
@@ -416,7 +421,7 @@
       },
       direction: 'down',
       level: level,
-      players: [this.player1, this.player2].filter(_isActivePlayer),
+      players: this._cachedPlayers || [this.player1, this.player2].filter(_isActivePlayer),
       cellWidth: this.cellWidth,
       screen: this.screen,
       graphics: this.graphics,
@@ -496,7 +501,19 @@
     var counter = 0;
     var graphics = this.graphics['num'];
     var digitWidth = graphics.width / 10;
-    var stageText = String(that.stage + 1);
+    // Pre-compute digits using math instead of String conversion (#9)
+    var stageNum = that.stage + 1;
+    var stageDigits = [];
+    if (stageNum === 0) {
+      stageDigits.push(0);
+    } else {
+      var tmp = stageNum;
+      while (tmp > 0) {
+        stageDigits.push(tmp % 10);
+        tmp = Math.floor(tmp / 10);
+      }
+      stageDigits.reverse();
+    }
     var anim = new DisplayObject({});
 
     setTimeout(function() {
@@ -504,7 +521,7 @@
     }, 800);
 
     anim.draw = function(screen) {
-      if (parseInt(height - diff) === that.screen.offsetY) {
+      if (Math.floor(height - diff) === that.screen.offsetY) {
         this.destroy();
       };
 
@@ -515,11 +532,11 @@
       screen.ctx.restore();
 
       if (counter < 20 * scale) {
-        for (var i = 0; i < stageText.length; i++) {
-          var digit = parseInt(stageText.charAt(i), 10);
+        for (var i = 0; i < stageDigits.length; i++) {
+          var digit = stageDigits[i];
           screen.ctx.save();
           screen.ctx.translate(
-            that.screen.width / 2 - stageText.length * digitWidth * scale / 2 + i * digitWidth * scale,
+            that.screen.width / 2 - stageDigits.length * digitWidth * scale / 2 + i * digitWidth * scale,
             that.screen.height / 2
           );
           screen.ctx.drawImage(graphics.image, digit * digitWidth, 0, digitWidth, graphics.height, 0, 0, digitWidth * scale, graphics.height * scale);
@@ -554,7 +571,7 @@
     this.player2Stock = opt.player2;
     this.player1 = null;
     this.player2 = null;
-    window.sss = this.screen;
+    this._cachedPlayers = [];
   }
 
   var proto = {};

@@ -44,13 +44,22 @@
   proto.draw = function(screen) {
     if (!this.visible) return;
     this.update(screen);
-    screen.ctx.save();
-    screen.ctx.globalAlpha = this.alpha;
-    screen.ctx.rotate(this.rotation * Math.PI / 180);
+    // Skip save/restore when alpha=1 and rotation=0 (#3)
+    var needsState = this.alpha !== 1 || this.rotation !== 0;
+    if (needsState) {
+      screen.ctx.save();
+      screen.ctx.globalAlpha = this.alpha;
+      screen.ctx.rotate(this.rotation * Math.PI / 180);
+    }
     screen.ctx.translate(this.offsetX * this.scale, this.offsetY * this.scale);
     this._draw(screen);
     this.debugRect(screen);
-    screen.ctx.restore();
+    if (needsState) {
+      screen.ctx.restore();
+    } else {
+      // Reset translate without save/restore
+      screen.ctx.translate(-this.offsetX * this.scale, -this.offsetY * this.scale);
+    }
   }
 
   proto._draw = function(screen) {

@@ -40,6 +40,20 @@
             channel.src = this.src;
             this._channels.push(channel);
             document.body.appendChild(channel);
+            // Clean up DOM node when playback ends to prevent memory leak (#7)
+            var channels = this._channels;
+            channel.addEventListener('ended', function onEnded() {
+              channel.removeEventListener('ended', onEnded);
+              if (channels.length > 1) {
+                var idx = channels.indexOf(channel);
+                if (idx > 0) { // keep original at index 0
+                  channels.splice(idx, 1);
+                  if (channel.parentNode) {
+                    channel.parentNode.removeChild(channel);
+                  }
+                }
+              }
+            });
           }
         }
       } else if (!this.paused && !this.ended) {
