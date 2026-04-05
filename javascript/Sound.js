@@ -27,8 +27,8 @@
       if (ctx && ctx.state === 'suspended') {
         ctx.resume();
       }
-      for (var i = 0; i < events.length; i++) {
-        document.removeEventListener(events[i], resume, true);
+      for (var j = 0; j < events.length; j++) {
+        document.removeEventListener(events[j], resume, true);
       }
     }
     for (var i = 0; i < events.length; i++) {
@@ -100,6 +100,8 @@
           channel.preload = 'auto';
           channel.src = this._audio.src;
           this._channels.push(channel);
+          // Append to DOM so the cloned element loads properly in all browsers
+          document.body.appendChild(channel);
         }
       }
     } else if (!this._audio.paused && !this._audio.ended) {
@@ -126,7 +128,10 @@
         if (xhr.status >= 200 && xhr.status < 300) {
           ctx.decodeAudioData(xhr.response, function(buffer) {
             _onLoaded(new WebAudioSound(buffer, allowOverlap));
-          }, function() {
+          }, function(err) {
+            if (typeof console !== 'undefined' && console.warn) {
+              console.warn('Audio decode failed for ' + item.src, err);
+            }
             _onError();
           });
         } else {
@@ -156,6 +161,8 @@
         settle(function() { _onError(); });
       };
       audio.src = item.src;
+      // Append to DOM so the audio element loads properly in all browsers
+      document.body.appendChild(audio);
     }
 
     function _onLoaded(soundWrapper) {
